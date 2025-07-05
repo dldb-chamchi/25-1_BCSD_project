@@ -1,0 +1,33 @@
+// src/main/java/com/example/model/Member.java
+package com.example.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "members")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA용
+@AllArgsConstructor(access = AccessLevel.PRIVATE)    // Builder 전용
+@Builder
+public class Member {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String name;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+}
