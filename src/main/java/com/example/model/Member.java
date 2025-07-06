@@ -1,4 +1,3 @@
-// src/main/java/com/example/model/Member.java
 package com.example.model;
 
 import jakarta.persistence.*;
@@ -10,8 +9,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "members")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA용
-@AllArgsConstructor(access = AccessLevel.PRIVATE)    // Builder 전용
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class Member {
     @Id
