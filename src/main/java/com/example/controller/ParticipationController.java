@@ -39,13 +39,9 @@ public class ParticipationController {
         return ResponseEntity.ok(dtos);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> leave(@PathVariable Long groupId, @PathVariable Long id) {
-        Participation p = partService.listByGroup(groupId).stream()
-                .filter(x -> x.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("참여 내역이 없습니다"));
-        partService.leave(groupId, p.getMemberId());
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity<Void> leave(@PathVariable Long groupId, @PathVariable Long memberId) {
+        partService.leave(groupId, memberId);
         return ResponseEntity.noContent().build();
     }
 }
