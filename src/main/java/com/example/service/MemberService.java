@@ -1,6 +1,8 @@
 package com.example.service;
 
 import com.example.dto.request.MemberRequestDto;
+import com.example.exception.DuplicateEmailException;
+import com.example.exception.ResourceNotFoundException;
 import com.example.model.Member;
 import com.example.model.Participation;
 import com.example.model.PurchaseGroup;
@@ -22,7 +24,7 @@ public class MemberService {
 
     public Member register(MemberRequestDto dto) {
         memberRepo.findByEmail(dto.getEmail())
-                .ifPresent(m -> { throw new RuntimeException("이미 존재하는 이메일입니다: " + dto.getEmail()); });
+                .ifPresent(m -> { throw new DuplicateEmailException("이미 존재하는 이메일입니다: " + dto.getEmail()); });
 
         Member m = Member.builder()
                 .email(dto.getEmail())
@@ -36,12 +38,12 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Member get(Long id) {
         return memberRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("회원이 없습니다: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("회원이 없습니다: " + id));
     }
 
     public void delete(Long id) {
         if (!memberRepo.existsById(id)) {
-            throw new RuntimeException("회원이 없습니다: " + id);
+            throw new ResourceNotFoundException("회원이 없습니다: " + id);
         }
         memberRepo.deleteById(id);
     }

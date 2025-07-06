@@ -1,6 +1,8 @@
 package com.example.service;
 
 import com.example.dto.request.ParticipationRequestDto;
+import com.example.exception.BadRequestException;
+import com.example.exception.ResourceNotFoundException;
 import com.example.model.Participation;
 import com.example.model.PurchaseGroup;
 import com.example.repository.ParticipationRepository;
@@ -21,9 +23,9 @@ public class ParticipationService {
 
     public Participation join(Long groupId, ParticipationRequestDto dto) {
         PurchaseGroup g = groupRepo.findById(groupId)
-                .orElseThrow(() -> new RuntimeException("그룹을 찾을 수 없습니다: " + groupId));
+                .orElseThrow(() -> new ResourceNotFoundException("그룹을 찾을 수 없습니다: " + groupId));
         if (g.getParticipants().size() >= g.getMaxMembers()) {
-            throw new RuntimeException("모집 인원이 가득 찼습니다");
+            throw new BadRequestException("모집 인원이 가득 찼습니다");
         }
         Participation p = Participation.builder()
                 .group(g)
@@ -39,7 +41,7 @@ public class ParticipationService {
         Participation p = partRepo.findByGroupId(groupId).stream()
                 .filter(x -> x.getMemberId().equals(memberId))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("참여 내역이 없습니다"));
+                .orElseThrow(() -> new ResourceNotFoundException("참여 내역이 없습니다"));
         PurchaseGroup g = p.getGroup();
         g.removeParticipant(p);
         partRepo.delete(p);

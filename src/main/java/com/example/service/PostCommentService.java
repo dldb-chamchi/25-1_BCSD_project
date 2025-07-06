@@ -1,6 +1,8 @@
 package com.example.service;
 
 import com.example.dto.request.CommentRequestDto;
+import com.example.exception.BadRequestException;
+import com.example.exception.ResourceNotFoundException;
 import com.example.model.GroupPost;
 import com.example.model.PostComment;
 import com.example.repository.GroupPostRepository;
@@ -21,14 +23,14 @@ public class PostCommentService {
 
     public PostComment create(Long postId, CommentRequestDto dto) {
         GroupPost p = postRepo.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
+                .orElseThrow(() -> new ResourceNotFoundException("게시글을 찾을 수 없습니다"));
 
         boolean isMember = participationService.listByGroup(p.getGroup().getId())
                 .stream()
                 .anyMatch(x -> x.getMemberId().equals(dto.getMemberId()));
 
         if (!isMember)
-            throw new RuntimeException("그룹 참여자만 댓글을 달 수 있습니다");
+            throw new BadRequestException("그룹 참여자만 댓글을 달 수 있습니다");
 
         PostComment c = PostComment.builder()
                 .post(p)

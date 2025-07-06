@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.dto.request.PostRequestDto;
+import com.example.exception.BadRequestException;
 import com.example.model.GroupPost;
 import com.example.model.PurchaseGroup;
 import com.example.repository.GroupPostRepository;
@@ -20,7 +21,7 @@ public class GroupPostService {
     public GroupPost create(Long groupId, Long hostId, PostRequestDto dto) {
         PurchaseGroup g = groupService.get(groupId);
         if (!g.getHostId().equals(hostId))
-            throw new RuntimeException("호스트만 게시글을 작성할 수 있습니다");
+            throw new BadRequestException("호스트만 게시글을 작성할 수 있습니다");
         GroupPost p = GroupPost.builder()
                 .group(g)
                 .hostId(hostId)

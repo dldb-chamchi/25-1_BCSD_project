@@ -1,6 +1,8 @@
 package com.example.service;
 
 import com.example.dto.request.GroupRequestDto;
+import com.example.exception.BadRequestException;
+import com.example.exception.ResourceNotFoundException;
 import com.example.model.PurchaseGroup;
 import com.example.repository.PurchaseGroupRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +39,13 @@ public class PurchaseGroupService {
     @Transactional(readOnly = true)
     public PurchaseGroup get(Long id) {
         return groupRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("그룹을 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("그룹을 찾을 수 없습니다: " + id));
     }
 
     public void delete(Long id, Long hostId) {
         PurchaseGroup g = get(id);
         if (!g.getHostId().equals(hostId)) {
-            throw new RuntimeException("호스트만 삭제 가능합니다");
+            throw new BadRequestException("호스트만 삭제 가능합니다");
         }
         groupRepo.delete(g);
     }
