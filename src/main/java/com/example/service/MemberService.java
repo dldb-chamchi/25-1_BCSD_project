@@ -20,7 +20,6 @@ public class MemberService {
     private final MemberRepository memberRepo;
     private final ParticipationRepository partRepo;
 
-    /** 회원 가입 */
     public Member register(MemberRequestDto dto) {
         memberRepo.findByEmail(dto.getEmail())
                 .ifPresent(m -> { throw new RuntimeException("이미 존재하는 이메일입니다: " + dto.getEmail()); });
@@ -34,14 +33,12 @@ public class MemberService {
         return memberRepo.save(m);
     }
 
-    /** 회원 조회 */
     @Transactional(readOnly = true)
     public Member get(Long id) {
         return memberRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("회원이 없습니다: " + id));
     }
 
-    /** 회원 탈퇴 */
     public void delete(Long id) {
         if (!memberRepo.existsById(id)) {
             throw new RuntimeException("회원이 없습니다: " + id);
@@ -49,7 +46,7 @@ public class MemberService {
         memberRepo.deleteById(id);
     }
 
-    /** 멤버가 참여(join)한 그룹 목록 조회 */
+    @Transactional(readOnly = true)
     public List<PurchaseGroup> getJoinedGroups(Long memberId) {
         List<Participation> parts = partRepo.findByMemberId(memberId);
         return parts.stream()
