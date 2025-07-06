@@ -1,11 +1,15 @@
 package com.example.controller;
 
 import com.example.dto.request.MemberRequestDto;
+import com.example.dto.response.CommentResponseDto;
 import com.example.dto.response.GroupResponseDto;
 import com.example.dto.response.MemberResponseDto;
+import com.example.dto.response.PostResponseDto;
 import com.example.model.Member;
 import com.example.model.PurchaseGroup;
+import com.example.service.GroupPostService;
 import com.example.service.MemberService;
+import com.example.service.PostCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +23,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final GroupPostService postService;
+    private final PostCommentService commentService;
 
     @PostMapping
     public ResponseEntity<MemberResponseDto> register(@RequestBody MemberRequestDto dto) {
@@ -58,6 +64,25 @@ public class MemberController {
                         g.getStatus(),
                         g.getParticipants().size()
                 ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/{memberId}/posts")
+    public ResponseEntity<List<PostResponseDto>> getMyPosts(@PathVariable Long memberId) {
+        var dtos = postService.listByHost(memberId).stream()
+                .map(p -> new PostResponseDto(
+                        p.getId(), p.getHostId(), p.getTitle(),
+                        p.getContent(), p.getCreatedAt()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/{memberId}/comments")
+    public ResponseEntity<List<CommentResponseDto>> getMyComments(@PathVariable Long memberId) {
+        var dtos = commentService.listByMember(memberId).stream()
+                .map(c -> new CommentResponseDto(
+                        c.getId(), c.getMemberId(), c.getContent(), c.getCreatedAt()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
