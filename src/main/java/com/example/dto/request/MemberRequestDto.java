@@ -1,4 +1,3 @@
-// src/main/java/com/example/dto/request/MemberRequestDto.java
 package com.example.dto.request;
 
 import lombok.Getter;

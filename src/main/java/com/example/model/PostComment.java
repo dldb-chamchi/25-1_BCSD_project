@@ -21,7 +21,7 @@ public class PostComment {
     private GroupPost post;
 
     @Column(name = "member_id", nullable = false)
-    private Long memberId;      // 댓글 작성자
+    private Long memberId;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
