@@ -1,11 +1,12 @@
 package com.example.controller;
 
-import com.example.dto.request.ParticipationRequestDto;
 import com.example.dto.response.ParticipationResponseDto;
-import com.example.model.Participation;
+import com.example.service.MemberService;
 import com.example.service.ParticipationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -17,17 +18,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ParticipationController {
     private final ParticipationService partService;
+    private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<ParticipationResponseDto> join(@PathVariable Long groupId,
-                                                         @RequestBody ParticipationRequestDto dto) {
-        Participation p = partService.join(groupId, dto);
-        ParticipationResponseDto res = new ParticipationResponseDto(
+    public ResponseEntity<ParticipationResponseDto> join(
+            @PathVariable Long groupId,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        var m = memberService.getByEmail(user.getUsername());
+        var p = partService.join(groupId, m.getId());
+        var res = new ParticipationResponseDto(
                 p.getId(), p.getMemberId(), p.getJoinedAt(), p.getPaymentStatus()
         );
-        return ResponseEntity.created(URI.create(
-                "/api/groups/" + groupId + "/participants/" + p.getId()
-        )).body(res);
+        return ResponseEntity.created(
+                URI.create("/api/groups/" + groupId + "/participants/" + p.getId())
+        ).body(res);
     }
 
     @GetMapping
