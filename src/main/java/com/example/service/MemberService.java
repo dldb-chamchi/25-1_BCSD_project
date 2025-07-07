@@ -9,6 +9,7 @@ import com.example.model.PurchaseGroup;
 import com.example.repository.MemberRepository;
 import com.example.repository.ParticipationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,24 +22,31 @@ import java.util.stream.Collectors;
 public class MemberService {
     private final MemberRepository memberRepo;
     private final ParticipationRepository partRepo;
+    private final PasswordEncoder passwordEncoder;
 
     public Member register(MemberRequestDto dto) {
         memberRepo.findByEmail(dto.getEmail())
                 .ifPresent(m -> { throw new DuplicateEmailException("이미 존재하는 이메일입니다: " + dto.getEmail()); });
-
-        Member m = Member.builder()
+        String encoded = passwordEncoder.encode(dto.getPassword());
+        var m = Member.builder()
                 .email(dto.getEmail())
-                .password(dto.getPassword())  //인증 도입 시 암호화 추가
+                .password(encoded)
                 .name(dto.getName())
                 .build();
-
         return memberRepo.save(m);
     }
+
 
     @Transactional(readOnly = true)
     public Member get(Long id) {
         return memberRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("회원이 없습니다: " + id));
+    }
+
+    @Transactional(readOnly=true)
+    public Member getByEmail(String email) {
+        return memberRepo.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("회원이 없습니다: " + email));
     }
 
     public void delete(Long id) {

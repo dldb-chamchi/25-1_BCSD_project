@@ -1,6 +1,5 @@
 package com.example.service;
 
-import com.example.dto.request.ParticipationRequestDto;
 import com.example.exception.BadRequestException;
 import com.example.exception.ResourceNotFoundException;
 import com.example.model.Participation;
@@ -21,15 +20,15 @@ public class ParticipationService {
     private final ParticipationRepository partRepo;
     private final PurchaseGroupRepository groupRepo;
 
-    public Participation join(Long groupId, ParticipationRequestDto dto) {
-        PurchaseGroup g = groupRepo.findById(groupId)
+    public Participation join(Long groupId, Long memberId) {
+        var g = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("그룹을 찾을 수 없습니다: " + groupId));
         if (g.getParticipants().size() >= g.getMaxMembers()) {
             throw new BadRequestException("모집 인원이 가득 찼습니다");
         }
-        Participation p = Participation.builder()
+        var p = Participation.builder()
                 .group(g)
-                .memberId(dto.getMemberId())
+                .memberId(memberId)
                 .joinedAt(LocalDateTime.now())
                 .paymentStatus("PENDING")
                 .build();
@@ -50,6 +49,11 @@ public class ParticipationService {
     @Transactional(readOnly = true)
     public List<Participation> listByGroup(Long groupId) {
         return partRepo.findByGroupId(groupId);
+    }
+
+    @Transactional(readOnly=true)
+    public List<Participation> listByMember(Long memberId) {
+        return partRepo.findByMemberId(memberId);
     }
 }
 
