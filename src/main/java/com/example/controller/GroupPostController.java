@@ -2,7 +2,6 @@ package com.example.controller;
 
 import com.example.dto.request.PostRequestDto;
 import com.example.dto.response.PostResponseDto;
-import com.example.model.GroupPost;
 import com.example.service.GroupPostService;
 import com.example.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -29,19 +28,15 @@ public class GroupPostController {
     ) {
         var m = memberService.getByEmail(user.getUsername());
         var p = postService.create(groupId, m.getId(), dto);
-        return ResponseEntity.created(
-                URI.create("/api/groups/" + groupId + "/posts/" + p.getId())
-        ).body(new PostResponseDto(
-                p.getId(), p.getHostId(), p.getTitle(), p.getContent(), p.getCreatedAt()
-        ));
+        return ResponseEntity.created(URI.create("/api/groups/" + groupId + "/posts/" + p.getId())).
+                body(new PostResponseDto(p.getId(), p.getHostId(), p.getTitle(), p.getContent(), p.getCreatedAt()));
     }
 
     @GetMapping
     public ResponseEntity<List<PostResponseDto>> list(@PathVariable Long groupId) {
         var dtos = postService.list(groupId).stream()
                 .map(p -> new PostResponseDto(p.getId(), p.getHostId(),
-                        p.getTitle(), p.getContent(), p.getCreatedAt()))
-                .toList();
+                        p.getTitle(), p.getContent(), p.getCreatedAt())).toList();
         return ResponseEntity.ok(dtos);
     }
 }

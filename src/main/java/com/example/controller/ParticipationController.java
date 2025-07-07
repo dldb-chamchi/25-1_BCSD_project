@@ -31,8 +31,7 @@ public class ParticipationController {
                 p.getId(), p.getMemberId(), p.getJoinedAt(), p.getPaymentStatus()
         );
         return ResponseEntity.created(
-                URI.create("/api/groups/" + groupId + "/participants/" + p.getId())
-        ).body(res);
+                URI.create("/api/groups/" + groupId + "/participants/" + p.getId())).body(res);
     }
 
     @GetMapping

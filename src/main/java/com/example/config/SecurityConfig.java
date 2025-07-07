@@ -35,53 +35,35 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
-    // ➊ JSON 로그인 필터를 빈으로 정의
     @Bean
     public JsonUsernamePasswordAuthenticationFilter jsonLoginFilter() throws Exception {
         var filter = new JsonUsernamePasswordAuthenticationFilter(
                 "/auth/login", authenticationManager()
         );
 
-        // 로그인 성공 시 200 리턴
         filter.setAuthenticationSuccessHandler((req, res, auth) ->
                 res.setStatus(HttpStatus.OK.value())
         );
 
-        // 로그인 실패 시 401 리턴
         filter.setAuthenticationFailureHandler((req, res, ex) ->
                 res.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage())
         );
-
         return filter;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                // ➋ CSRF 완전 비활성화
-                .csrf(AbstractHttpConfigurer::disable)
-
-                // ➌ 인증 프로바이더 등록
+        http.csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(authenticationProvider())
-
-                // ➍ permitAll
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/api/members").permitAll()
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers("/auth/**", "/api/members").permitAll()
                         .anyRequest().authenticated()
                 )
-
-                // ➎ formLogin 도 꺼 주세요
                 .formLogin(AbstractHttpConfigurer::disable)
-
-                // ➏ JSON 필터를 UsernamePasswordAuthenticationFilter 자리로 교체
                 .addFilterAt(jsonLoginFilter(), UsernamePasswordAuthenticationFilter.class)
-
-                // ➐ 세션 생성 정책
                 .sessionManagement(sess ->
                         sess.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
-
-                // ➑ 로그아웃
                 .logout(logout -> logout
                         .logoutUrl("/auth/logout")
                         .invalidateHttpSession(true)
@@ -91,7 +73,6 @@ public class SecurityConfig {
                         )
                 )
         ;
-
         return http.build();
     }
 }

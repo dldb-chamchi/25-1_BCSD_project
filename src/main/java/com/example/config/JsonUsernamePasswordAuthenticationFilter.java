@@ -24,9 +24,7 @@ public class JsonUsernamePasswordAuthenticationFilter
     private final ObjectMapper mapper = new ObjectMapper();
 
     public JsonUsernamePasswordAuthenticationFilter(String url, AuthenticationManager authManager) {
-        setRequiresAuthenticationRequestMatcher(
-                new AntPathRequestMatcher(url, "POST")
-        );
+        setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(url, "POST"));
         setAuthenticationManager(authManager);
     }
 

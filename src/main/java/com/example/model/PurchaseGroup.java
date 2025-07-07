@@ -48,7 +48,6 @@ public class PurchaseGroup {
     @Builder.Default
     private List<Participation> participants = new ArrayList<>();
 
-    //연관관계 편의 메서드
     public void addParticipant(Participation p) {
         participants.add(p);
     }

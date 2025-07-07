@@ -38,9 +38,7 @@ public class PostCommentController {
                 c.getId(), c.getMemberId(), c.getContent(), c.getCreatedAt()
         );
         return ResponseEntity
-                .created(URI.create("/api/groups/" + groupId
-                        + "/posts/" + postId
-                        + "/comments/" + c.getId()))
+                .created(URI.create("/api/groups/" + groupId + "/posts/" + postId + "/comments/" + c.getId()))
                 .body(res);
     }
 
