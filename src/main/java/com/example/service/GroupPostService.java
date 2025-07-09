@@ -48,6 +48,17 @@ public class GroupPostService {
         return post;
     }
 
+    @Transactional(readOnly = true)
+    public GroupPost getById(Long groupId, Long postId) {
+        groupService.get(groupId);
+        GroupPost post = postRepo.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("게시글을 찾을 수 없습니다: " + postId));
+        if (!post.getGroup().getId().equals(groupId)) {
+            throw new BadRequestException("잘못된 그룹 경로입니다");
+        }
+        return post;
+    }
+
     @Transactional(readOnly=true)
     public List<GroupPost> list(Long groupId, Pageable pageable) {
         groupService.get(groupId);

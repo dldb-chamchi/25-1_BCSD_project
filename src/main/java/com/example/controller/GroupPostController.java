@@ -56,6 +56,20 @@ public class GroupPostController {
         return ResponseEntity.ok(res);
     }
 
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDto> getById(
+            @PathVariable Long groupId,
+            @PathVariable Long postId
+    ) {
+        GroupPost p = postService.getById(groupId, postId);
+        PostResponseDto dto = new PostResponseDto(
+                p.getId(), p.getHostId(),
+                p.getTitle(), p.getContent(),
+                p.getCreatedAt()
+        );
+        return ResponseEntity.ok(dto);
+    }
+
     @GetMapping
     public ResponseEntity<List<PostResponseDto>> list(@PathVariable Long groupId,
                                                       @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
