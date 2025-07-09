@@ -66,4 +66,17 @@ public class PostCommentService {
         comment.update(dto.getContent());
         return comment;
     }
+    public void delete(Long groupId, Long postId, Long commentId, Long memberId) {
+        PostComment c = commentRepo.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("댓글을 찾을 수 없습니다: " + commentId));
+
+        if (!c.getPost().getId().equals(postId)
+                || !c.getPost().getGroup().getId().equals(groupId)) {
+            throw new BadRequestException("잘못된 경로입니다");
+        }
+        if (!c.getMemberId().equals(memberId)) {
+            throw new AccessDeniedException("작성자만 삭제할 수 있습니다");
+        }
+        commentRepo.delete(c);
+    }
 }

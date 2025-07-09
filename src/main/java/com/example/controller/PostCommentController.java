@@ -80,4 +80,16 @@ public class PostCommentController {
         );
         return ResponseEntity.ok(res);
     }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long groupId,
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        Member m = memberService.getByEmail(user.getUsername());
+        commentService.delete(groupId, postId, commentId, m.getId());
+        return ResponseEntity.noContent().build();
+    }
 }
