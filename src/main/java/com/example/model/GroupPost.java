@@ -36,4 +36,9 @@ public class GroupPost {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostComment> comments = new ArrayList<>();
+
+    public void update(String newTitle, String newContent) {
+        this.title   = newTitle;
+        this.content = newContent;
+    }
 }

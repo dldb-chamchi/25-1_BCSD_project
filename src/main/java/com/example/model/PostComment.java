@@ -28,4 +28,8 @@ public class PostComment {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public void update(String newContent) {
+        this.content = newContent;
+    }
 }
