@@ -5,6 +5,9 @@ import com.example.dto.response.PostResponseDto;
 import com.example.service.GroupPostService;
 import com.example.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,8 +36,10 @@ public class GroupPostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostResponseDto>> list(@PathVariable Long groupId) {
-        var dtos = postService.list(groupId).stream()
+    public ResponseEntity<List<PostResponseDto>> list(@PathVariable Long groupId,
+                                                      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+                                                      Pageable pageable) {
+        var dtos = postService.list(groupId, pageable).stream()
                 .map(p -> new PostResponseDto(p.getId(), p.getHostId(),
                         p.getTitle(), p.getContent(), p.getCreatedAt())).toList();
         return ResponseEntity.ok(dtos);

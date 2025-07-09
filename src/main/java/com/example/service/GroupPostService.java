@@ -6,6 +6,7 @@ import com.example.model.GroupPost;
 import com.example.model.PurchaseGroup;
 import com.example.repository.GroupPostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,12 +33,13 @@ public class GroupPostService {
     }
 
     @Transactional(readOnly=true)
-    public List<GroupPost> list(Long groupId) {
-        return postRepo.findByGroupId(groupId);
+    public List<GroupPost> list(Long groupId, Pageable pageable) {
+        groupService.get(groupId);
+        return postRepo.findByGroupId(groupId, pageable);
     }
 
     @Transactional(readOnly=true)
-    public List<GroupPost> listByHost(Long hostId) {
-        return postRepo.findByHostId(hostId);
+    public List<GroupPost> listByHost(Long hostId, Pageable pageable) {
+        return postRepo.findByHostId(hostId, pageable);
     }
 }

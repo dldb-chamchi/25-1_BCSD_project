@@ -13,6 +13,9 @@ import com.example.service.PostCommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,8 +76,10 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/posts")
-    public ResponseEntity<List<PostResponseDto>> getMyPosts(@PathVariable Long memberId) {
-        var dtos = postService.listByHost(memberId).stream()
+    public ResponseEntity<List<PostResponseDto>> getMyPosts(@PathVariable Long memberId,
+                                                            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+                                                            Pageable pageable) {
+        var dtos = postService.listByHost(memberId, pageable).stream()
                 .map(p -> new PostResponseDto(
                         p.getId(), p.getHostId(), p.getTitle(),
                         p.getContent(), p.getCreatedAt()))
