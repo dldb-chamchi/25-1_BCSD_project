@@ -57,6 +57,9 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public List<PurchaseGroup> getJoinedGroups(Long memberId) {
+        if(!memberRepo.existsById(memberId)) {
+            throw new ResourceNotFoundException("회원이 없습니다: " + memberId);
+        }
         List<Participation> parts = partRepo.findByMemberId(memberId);
         return parts.stream()
                 .map(Participation::getGroup)

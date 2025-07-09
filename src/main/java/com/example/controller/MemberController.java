@@ -79,6 +79,7 @@ public class MemberController {
     public ResponseEntity<List<PostResponseDto>> getMyPosts(@PathVariable Long memberId,
                                                             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
                                                             Pageable pageable) {
+        memberService.get(memberId);
         var dtos = postService.listByHost(memberId, pageable).stream()
                 .map(p -> new PostResponseDto(
                         p.getId(), p.getHostId(), p.getTitle(),
@@ -89,6 +90,7 @@ public class MemberController {
 
     @GetMapping("/{memberId}/comments")
     public ResponseEntity<List<CommentResponseDto>> getMyComments(@PathVariable Long memberId) {
+        memberService.get(memberId);
         var dtos = commentService.listByMember(memberId).stream()
                 .map(c -> new CommentResponseDto(
                         c.getId(), c.getMemberId(), c.getContent(), c.getCreatedAt()))
