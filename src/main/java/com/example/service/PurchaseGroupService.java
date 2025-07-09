@@ -4,10 +4,12 @@ import com.example.dto.request.GroupRequestDto;
 import com.example.exception.BadRequestException;
 import com.example.exception.ResourceNotFoundException;
 import com.example.model.PurchaseGroup;
+import com.example.repository.GroupPostRepository;
 import com.example.repository.PurchaseGroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.model.Participation;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
 @Transactional
 public class PurchaseGroupService {
     private final PurchaseGroupRepository groupRepo;
+    private final GroupPostRepository postRepo;
 
     public PurchaseGroup create(GroupRequestDto dto, Long hostId) {
         PurchaseGroup group = PurchaseGroup.builder()
@@ -28,6 +31,15 @@ public class PurchaseGroupService {
                 .createdAt(LocalDateTime.now())
                 .status("OPEN")
                 .build();
+
+        Participation hostParticipation = Participation.builder()
+                .group(group)
+                .memberId(hostId)
+                .joinedAt(LocalDateTime.now())
+                .paymentStatus("PENDING")
+                .build();
+        group.addParticipant(hostParticipation);
+
         return groupRepo.save(group);
     }
 
