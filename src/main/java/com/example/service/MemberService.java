@@ -36,7 +36,6 @@ public class MemberService {
         return memberRepo.save(m);
     }
 
-
     @Transactional(readOnly = true)
     public Member get(Long id) {
         return memberRepo.findById(id)

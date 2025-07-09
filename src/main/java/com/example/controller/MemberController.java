@@ -10,6 +10,8 @@ import com.example.model.PurchaseGroup;
 import com.example.service.GroupPostService;
 import com.example.service.MemberService;
 import com.example.service.PostCommentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/members")
 @RequiredArgsConstructor
+@Tag(name = "User", description = "사용자 관련 API")
 public class MemberController {
     private final MemberService memberService;
     private final GroupPostService postService;
@@ -52,6 +55,7 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/groups")
+    @Operation(summary = "단일 사용자 조회", description = "ID로 사용자 정보를 조회합니다.")
     public ResponseEntity<List<GroupResponseDto>> getJoinedGroups(@PathVariable Long memberId) {
         List<PurchaseGroup> groups = memberService.getJoinedGroups(memberId);
         List<GroupResponseDto> dtos = groups.stream()
