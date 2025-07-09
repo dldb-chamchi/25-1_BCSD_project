@@ -23,6 +23,9 @@ public class ParticipationService {
     public Participation join(Long groupId, Long memberId) {
         var g = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("그룹을 찾을 수 없습니다: " + groupId));
+        if ("CLOSED".equals(g.getStatus())) {
+            throw new BadRequestException("마감된 그룹에는 더 이상 참여할 수 없습니다");
+        }
         if (g.getParticipants().size() >= g.getMaxMembers()) {
             throw new BadRequestException("모집 인원이 가득 찼습니다");
         }
