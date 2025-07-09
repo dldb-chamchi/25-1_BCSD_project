@@ -1,11 +1,13 @@
 package com.example.service;
 
+import com.example.dto.request.CommentRequestDto;
 import com.example.exception.BadRequestException;
 import com.example.exception.ResourceNotFoundException;
 import com.example.model.PostComment;
 import com.example.repository.GroupPostRepository;
 import com.example.repository.PostCommentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,5 +43,27 @@ public class PostCommentService {
     @Transactional(readOnly=true)
     public List<PostComment> listByMember(Long memberId) {
         return commentRepo.findByMemberId(memberId);
+    }
+
+    public PostComment update(
+            Long groupId,
+            Long postId,
+            Long commentId,
+            Long memberId,
+            CommentRequestDto dto
+    ) {
+        PostComment comment = commentRepo.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("댓글을 찾을 수 없습니다: " + commentId));
+
+        if (!comment.getPost().getId().equals(postId)
+                || !comment.getPost().getGroup().getId().equals(groupId)) {
+            throw new BadRequestException("잘못된 경로(groupId/postId) 입니다");
+        }
+        if (!comment.getMemberId().equals(memberId)) {
+            throw new AccessDeniedException("댓글 작성자만 수정할 수 있습니다");
+        }
+
+        comment.update(dto.getContent());
+        return comment;
     }
 }

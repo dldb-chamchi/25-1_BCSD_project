@@ -3,6 +3,8 @@ package com.example.controller;
 import com.example.dto.request.CommentRequestDto;
 import com.example.dto.response.CommentResponseDto;
 import com.example.exception.BadRequestException;
+import com.example.model.Member;
+import com.example.model.PostComment;
 import com.example.service.MemberService;
 import com.example.service.PostCommentService;
 import lombok.RequiredArgsConstructor;
@@ -54,5 +56,28 @@ public class PostCommentController {
                 ))
                 .toList();
         return ResponseEntity.ok(dtos);
+    }
+
+
+    @PutMapping("/{commentId}")
+    public ResponseEntity<CommentResponseDto> update(
+            @PathVariable Long groupId,
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal UserDetails user,
+            @RequestBody CommentRequestDto dto
+    ) {
+        Member m = memberService.getByEmail(user.getUsername());
+        PostComment updated = commentService.update(
+                groupId, postId, commentId,
+                m.getId(), dto
+        );
+        CommentResponseDto res = new CommentResponseDto(
+                updated.getId(),
+                updated.getMemberId(),
+                updated.getContent(),
+                updated.getCreatedAt()
+        );
+        return ResponseEntity.ok(res);
     }
 }
