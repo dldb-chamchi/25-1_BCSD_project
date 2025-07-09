@@ -10,4 +10,5 @@ import java.util.List;
 public interface ParticipationRepository extends JpaRepository<Participation, Long> {
     List<Participation> findByGroupId(Long groupId);
     List<Participation> findByMemberId(Long memberId);
+    boolean existsByGroupIdAndMemberId(Long groupId, Long memberId);
 }
