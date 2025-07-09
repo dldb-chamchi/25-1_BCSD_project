@@ -11,4 +11,5 @@ import java.util.List;
 public interface GroupPostRepository extends JpaRepository<GroupPost, Long> {
     List<GroupPost> findByGroupId(Long groupId, Pageable pageable);
     List<GroupPost> findByHostId(Long HostId, Pageable pageable);
+    boolean existsByGroupId(Long groupId);
 }
