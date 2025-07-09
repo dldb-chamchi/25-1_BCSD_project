@@ -26,6 +26,9 @@ public class ParticipationService {
         if (g.getParticipants().size() >= g.getMaxMembers()) {
             throw new BadRequestException("모집 인원이 가득 찼습니다");
         }
+        if (partRepo.existsByGroupIdAndMemberId(groupId, memberId)) {
+            throw new BadRequestException("이미 이 그룹에 참여 중입니다");
+        }
         var p = Participation.builder()
                 .group(g)
                 .memberId(memberId)
