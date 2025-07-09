@@ -2,6 +2,8 @@ package com.example.controller;
 
 import com.example.dto.request.PostRequestDto;
 import com.example.dto.response.PostResponseDto;
+import com.example.model.GroupPost;
+import com.example.model.Member;
 import com.example.service.GroupPostService;
 import com.example.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,25 @@ public class GroupPostController {
                 body(new PostResponseDto(p.getId(), p.getHostId(), p.getTitle(), p.getContent(), p.getCreatedAt()));
     }
 
+    @PutMapping("/{postId}")
+    public ResponseEntity<PostResponseDto> update(
+            @PathVariable Long groupId,
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserDetails user,
+            @RequestBody PostRequestDto dto
+    ) {
+        Member host = memberService.getByEmail(user.getUsername());
+        GroupPost updated = postService.update(groupId, postId, host.getId(), dto);
+        PostResponseDto res = new PostResponseDto(
+                updated.getId(),
+                updated.getHostId(),
+                updated.getTitle(),
+                updated.getContent(),
+                updated.getCreatedAt()
+        );
+        return ResponseEntity.ok(res);
+    }
+
     @GetMapping
     public ResponseEntity<List<PostResponseDto>> list(@PathVariable Long groupId,
                                                       @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
@@ -43,5 +64,16 @@ public class GroupPostController {
                 .map(p -> new PostResponseDto(p.getId(), p.getHostId(),
                         p.getTitle(), p.getContent(), p.getCreatedAt())).toList();
         return ResponseEntity.ok(dtos);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long groupId,
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        Member m = memberService.getByEmail(user.getUsername());
+        postService.delete(groupId, postId, m.getId());
+        return ResponseEntity.noContent().build();
     }
 }
