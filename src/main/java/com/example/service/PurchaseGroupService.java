@@ -59,6 +59,12 @@ public class PurchaseGroupService {
         if (!g.getHostId().equals(hostId)) {
             throw new BadRequestException("호스트만 삭제 가능합니다");
         }
+        if (g.getParticipants().size() > 1) {
+            throw new BadRequestException("참여자가 남아있는 그룹은 삭제할 수 없습니다");
+        }
+        if (postRepo.existsByGroupId(id)) {
+            throw new BadRequestException("게시글이 존재하는 그룹은 삭제할 수 없습니다");
+        }
         groupRepo.delete(g);
     }
 }
