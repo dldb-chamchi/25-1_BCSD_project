@@ -6,6 +6,7 @@ import com.example.model.Member;
 import com.example.model.PurchaseGroup;
 import com.example.service.MemberService;
 import com.example.service.PurchaseGroupService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,7 +25,7 @@ public class PurchaseGroupController {
     private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<GroupResponseDto> create(
+    public ResponseEntity<GroupResponseDto> create(@Valid
             @RequestBody GroupRequestDto dto,
             @AuthenticationPrincipal UserDetails user
     ) {
@@ -60,11 +61,43 @@ public class PurchaseGroupController {
         return ResponseEntity.ok(res);
     }
 
+    @GetMapping("/open")
+    public ResponseEntity<List<GroupResponseDto>> listOpen() {
+        List<GroupResponseDto> dtos = groupService.listOpen().stream()
+                .map(g -> new GroupResponseDto(
+                        g.getId(),
+                        g.getTitle(),
+                        g.getDescription(),
+                        g.getExpiresAt(),
+                        g.getMaxMembers(),
+                        g.getStatus(),
+                        g.getParticipants().size()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity<List<GroupResponseDto>> listAvailable() {
+        List<GroupResponseDto> dtos = groupService.listAvailable().stream()
+                .map(g -> new GroupResponseDto(
+                        g.getId(),
+                        g.getTitle(),
+                        g.getDescription(),
+                        g.getExpiresAt(),
+                        g.getMaxMembers(),
+                        g.getStatus(),
+                        g.getParticipants().size()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
     @PutMapping("/{groupId}")
     public ResponseEntity<GroupResponseDto> update(
             @PathVariable Long groupId,
             @AuthenticationPrincipal UserDetails user,
-            @RequestBody GroupRequestDto dto
+            @Valid @RequestBody GroupRequestDto dto
     ) {
         Member m = memberService.getByEmail(user.getUsername());
         PurchaseGroup updated = groupService.update(groupId, m.getId(), dto);
