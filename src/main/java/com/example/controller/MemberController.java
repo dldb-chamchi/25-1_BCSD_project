@@ -54,12 +54,6 @@ public class MemberController {
         ));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        memberService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/{memberId}/groups")
     @Operation(summary = "단일 사용자 조회", description = "ID로 사용자 정보를 조회합니다.")
     public ResponseEntity<List<GroupResponseDto>> getJoinedGroups(@PathVariable Long memberId) {
@@ -139,5 +133,48 @@ public class MemberController {
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/me/posts")
+    public ResponseEntity<List<PostResponseDto>> myPosts(
+            @AuthenticationPrincipal UserDetails user,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        Member m = memberService.getByEmail(user.getUsername());
+        var posts = postService.listByHost(m.getId(), pageable);
+        var dtos = posts.stream()
+                .map(p -> new PostResponseDto(
+                        p.getId(),
+                        p.getHostId(),
+                        p.getTitle(),
+                        p.getContent(),
+                        p.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/me/comments")
+    public ResponseEntity<List<CommentResponseDto>> myComments(
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        Member m = memberService.getByEmail(user.getUsername());
+        var comments = commentService.listByMember(m.getId());
+        var dtos = comments.stream()
+                .map(c -> new CommentResponseDto(
+                        c.getId(),
+                        c.getMemberId(),
+                        c.getContent(),
+                        c.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        memberService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
