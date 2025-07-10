@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.dto.request.GroupRequestDto;
 import com.example.dto.response.GroupResponseDto;
+import com.example.model.Member;
 import com.example.model.PurchaseGroup;
 import com.example.service.MemberService;
 import com.example.service.PurchaseGroupService;
@@ -57,6 +58,37 @@ public class PurchaseGroupController {
                 g.getParticipants().size()
         );
         return ResponseEntity.ok(res);
+    }
+
+    @PutMapping("/{groupId}")
+    public ResponseEntity<GroupResponseDto> update(
+            @PathVariable Long groupId,
+            @AuthenticationPrincipal UserDetails user,
+            @RequestBody GroupRequestDto dto
+    ) {
+        Member m = memberService.getByEmail(user.getUsername());
+        PurchaseGroup updated = groupService.update(groupId, m.getId(), dto);
+        GroupResponseDto res = new GroupResponseDto(
+                updated.getId(),
+                updated.getTitle(),
+                updated.getDescription(),
+                updated.getExpiresAt(),
+                updated.getMaxMembers(),
+                updated.getStatus(),
+                updated.getParticipants().size()
+        );
+        return ResponseEntity.ok(res);
+    }
+
+    @PatchMapping("/{groupId}/status")
+    public ResponseEntity<Void> patchStatus(
+            @PathVariable Long groupId,
+            @AuthenticationPrincipal UserDetails user,
+            @RequestParam("status") String status
+    ) {
+        var m = memberService.getByEmail(user.getUsername());
+        groupService.changeStatus(groupId, m.getId(), status.toUpperCase());
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

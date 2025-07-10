@@ -54,6 +54,23 @@ public class PurchaseGroupService {
                 .orElseThrow(() -> new ResourceNotFoundException("그룹을 찾을 수 없습니다: " + id));
     }
 
+    public PurchaseGroup update(Long groupId, Long hostId, GroupRequestDto dto) {
+        PurchaseGroup g = get(groupId);
+        if (!g.getHostId().equals(hostId)) {
+            throw new BadRequestException("호스트만 수정할 수 있습니다");
+        }
+        g.update(dto.getTitle(), dto.getDescription(), dto.getMaxMembers(), dto.getExpiresAt());
+        return g;
+    }
+
+    public void changeStatus(Long groupId, Long hostId, String newStatus) {
+        PurchaseGroup g = get(groupId);
+        if (!g.getHostId().equals(hostId)) {
+            throw new BadRequestException("호스트만 상태를 변경할 수 있습니다");
+        }
+        g.updateStatus(newStatus);
+    }
+
     public void delete(Long id, Long hostId) {
         PurchaseGroup g = get(id);
         if (!g.getHostId().equals(hostId)) {
