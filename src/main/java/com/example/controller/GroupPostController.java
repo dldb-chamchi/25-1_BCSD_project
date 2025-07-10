@@ -6,6 +6,7 @@ import com.example.model.GroupPost;
 import com.example.model.Member;
 import com.example.service.GroupPostService;
 import com.example.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,7 +30,7 @@ public class GroupPostController {
     public ResponseEntity<PostResponseDto> create(
             @PathVariable Long groupId,
             @AuthenticationPrincipal UserDetails user,
-            @RequestBody PostRequestDto dto
+            @Valid @RequestBody PostRequestDto dto
     ) {
         var m = memberService.getByEmail(user.getUsername());
         var p = postService.create(groupId, m.getId(), dto);
@@ -42,7 +43,7 @@ public class GroupPostController {
             @PathVariable Long groupId,
             @PathVariable Long postId,
             @AuthenticationPrincipal UserDetails user,
-            @RequestBody PostRequestDto dto
+            @Valid @RequestBody PostRequestDto dto
     ) {
         Member host = memberService.getByEmail(user.getUsername());
         GroupPost updated = postService.update(groupId, postId, host.getId(), dto);

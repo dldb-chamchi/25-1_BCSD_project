@@ -7,6 +7,7 @@ import com.example.model.Member;
 import com.example.model.PostComment;
 import com.example.service.MemberService;
 import com.example.service.PostCommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,7 +29,7 @@ public class PostCommentController {
             @PathVariable Long groupId,
             @PathVariable Long postId,
             @AuthenticationPrincipal UserDetails user,
-            @RequestBody CommentRequestDto dto
+            @Valid @RequestBody CommentRequestDto dto
     ) {
         var member = memberService.getByEmail(user.getUsername());
         var c = commentService.create(postId, member.getId(), dto.getContent());
@@ -65,7 +66,7 @@ public class PostCommentController {
             @PathVariable Long postId,
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserDetails user,
-            @RequestBody CommentRequestDto dto
+            @Valid @RequestBody CommentRequestDto dto
     ) {
         Member m = memberService.getByEmail(user.getUsername());
         PostComment updated = commentService.update(
