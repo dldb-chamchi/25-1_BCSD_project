@@ -120,4 +120,24 @@ public class MemberController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
+
+    @GetMapping("/me/groups/host")
+    public ResponseEntity<List<GroupResponseDto>> myHostGroups(
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        Member m = memberService.getByEmail(user.getUsername());
+        List<PurchaseGroup> groups = memberService.getHostGroups(m.getId());
+        List<GroupResponseDto> dtos = groups.stream()
+                .map(g -> new GroupResponseDto(
+                        g.getId(),
+                        g.getTitle(),
+                        g.getDescription(),
+                        g.getExpiresAt(),
+                        g.getMaxMembers(),
+                        g.getStatus(),
+                        g.getParticipants().size()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
 }
