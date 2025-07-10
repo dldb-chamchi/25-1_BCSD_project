@@ -50,18 +50,10 @@ public class PurchaseGroup {
     private List<Participation> participants = new ArrayList<>();
 
     public void update(String newTitle, String newDescription, Integer newMaxMembers, LocalDateTime newExpiresAt) {
-        if (newTitle != null && !newTitle.isBlank()) {
             this.title = newTitle;
-        }
-        if (newDescription != null) {
             this.description = newDescription;
-        }
-        if (newMaxMembers != null) {
             this.maxMembers = newMaxMembers;
-        }
-        if (newExpiresAt != null) {
             this.expiresAt = newExpiresAt;
-        }
     }
 
     public void updateStatus(String newStatus) {
