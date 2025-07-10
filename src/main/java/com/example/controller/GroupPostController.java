@@ -38,25 +38,6 @@ public class GroupPostController {
                 body(new PostResponseDto(p.getId(), p.getHostId(), p.getTitle(), p.getContent(), p.getCreatedAt()));
     }
 
-    @PutMapping("/{postId}")
-    public ResponseEntity<PostResponseDto> update(
-            @PathVariable Long groupId,
-            @PathVariable Long postId,
-            @AuthenticationPrincipal UserDetails user,
-            @Valid @RequestBody PostRequestDto dto
-    ) {
-        Member host = memberService.getByEmail(user.getUsername());
-        GroupPost updated = postService.update(groupId, postId, host.getId(), dto);
-        PostResponseDto res = new PostResponseDto(
-                updated.getId(),
-                updated.getHostId(),
-                updated.getTitle(),
-                updated.getContent(),
-                updated.getCreatedAt()
-        );
-        return ResponseEntity.ok(res);
-    }
-
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto> getById(
             @PathVariable Long groupId,
@@ -79,6 +60,25 @@ public class GroupPostController {
                 .map(p -> new PostResponseDto(p.getId(), p.getHostId(),
                         p.getTitle(), p.getContent(), p.getCreatedAt())).toList();
         return ResponseEntity.ok(dtos);
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<PostResponseDto> update(
+            @PathVariable Long groupId,
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserDetails user,
+            @Valid @RequestBody PostRequestDto dto
+    ) {
+        Member host = memberService.getByEmail(user.getUsername());
+        GroupPost updated = postService.update(groupId, postId, host.getId(), dto);
+        PostResponseDto res = new PostResponseDto(
+                updated.getId(),
+                updated.getHostId(),
+                updated.getTitle(),
+                updated.getContent(),
+                updated.getCreatedAt()
+        );
+        return ResponseEntity.ok(res);
     }
 
     @DeleteMapping("/{postId}")
