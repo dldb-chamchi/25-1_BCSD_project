@@ -54,6 +54,16 @@ public class PurchaseGroupService {
                 .orElseThrow(() -> new ResourceNotFoundException("그룹을 찾을 수 없습니다: " + id));
     }
 
+    @Transactional(readOnly = true)
+    public List<PurchaseGroup> listOpen() {
+        return groupRepo.findByStatus("OPEN");
+    }
+
+    @Transactional(readOnly = true)
+    public List<PurchaseGroup> listAvailable() {
+        return groupRepo.findAvailableByStatusAndMaxMembers("OPEN");
+    }
+
     public PurchaseGroup update(Long groupId, Long hostId, GroupRequestDto dto) {
         PurchaseGroup g = get(groupId);
         if (!g.getHostId().equals(hostId)) {
