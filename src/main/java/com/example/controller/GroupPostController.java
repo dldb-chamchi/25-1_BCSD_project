@@ -54,7 +54,7 @@ public class GroupPostController {
 
     @GetMapping
     public ResponseEntity<List<PostResponseDto>> list(@PathVariable Long groupId,
-                                                      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+                                                      @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
                                                       Pageable pageable) {
         var dtos = postService.list(groupId, pageable).stream()
                 .map(p -> new PostResponseDto(p.getId(), p.getHostId(),

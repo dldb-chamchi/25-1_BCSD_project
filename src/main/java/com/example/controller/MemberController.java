@@ -74,7 +74,7 @@ public class MemberController {
 
     @GetMapping("/{memberId}/posts")
     public ResponseEntity<List<PostResponseDto>> getMyPosts(@PathVariable Long memberId,
-                                                            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+                                                            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
                                                             Pageable pageable) {
         memberService.get(memberId);
         var dtos = postService.listByHost(memberId, pageable).stream()
@@ -138,7 +138,7 @@ public class MemberController {
     @GetMapping("/me/posts")
     public ResponseEntity<List<PostResponseDto>> myPosts(
             @AuthenticationPrincipal UserDetails user,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
         Member m = memberService.getByEmail(user.getUsername());
