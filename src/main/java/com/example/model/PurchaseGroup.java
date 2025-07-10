@@ -1,5 +1,6 @@
 package com.example.model;
 
+import com.example.exception.BadRequestException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,6 +48,28 @@ public class PurchaseGroup {
 
     @Builder.Default
     private List<Participation> participants = new ArrayList<>();
+
+    public void update(String newTitle, String newDescription, Integer newMaxMembers, LocalDateTime newExpiresAt) {
+        if (newTitle != null && !newTitle.isBlank()) {
+            this.title = newTitle;
+        }
+        if (newDescription != null) {
+            this.description = newDescription;
+        }
+        if (newMaxMembers != null) {
+            this.maxMembers = newMaxMembers;
+        }
+        if (newExpiresAt != null) {
+            this.expiresAt = newExpiresAt;
+        }
+    }
+
+    public void updateStatus(String newStatus) {
+        if (!List.of("OPEN","CLOSED").contains(newStatus)) {
+            throw new BadRequestException("유효한 상태가 아닙니다");
+        }
+        this.status = newStatus;
+    }
 
     public void addParticipant(Participation p) {
         participants.add(p);
