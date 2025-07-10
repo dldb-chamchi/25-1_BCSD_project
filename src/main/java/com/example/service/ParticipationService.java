@@ -42,6 +42,11 @@ public class ParticipationService {
         return partRepo.save(p);
     }
 
+    @Transactional(readOnly = true)
+    public List<Participation> listByGroup(Long groupId) {
+        return partRepo.findByGroupId(groupId);
+    }
+
     public void leave(Long groupId, Long memberId) {
         Participation p = partRepo.findByGroupId(groupId).stream()
                 .filter(x -> x.getMemberId().equals(memberId))
@@ -50,16 +55,6 @@ public class ParticipationService {
         PurchaseGroup g = p.getGroup();
         g.removeParticipant(p);
         partRepo.delete(p);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Participation> listByGroup(Long groupId) {
-        return partRepo.findByGroupId(groupId);
-    }
-
-    @Transactional(readOnly=true)
-    public List<Participation> listByMember(Long memberId) {
-        return partRepo.findByMemberId(memberId);
     }
 }
 

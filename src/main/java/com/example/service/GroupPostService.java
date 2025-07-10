@@ -36,18 +36,6 @@ public class GroupPostService {
         return postRepo.save(p);
     }
 
-    public GroupPost update(Long groupId, Long postId, Long hostId, PostRequestDto dto) {
-        var post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("게시글을 찾을 수 없습니다: " + postId));
-        if (!post.getGroup().getId().equals(groupId)) {
-            throw new BadRequestException("잘못된 그룹 경로입니다");
-        }
-        if (!post.getHostId().equals(hostId)) {
-            throw new AccessDeniedException("호스트만 게시글을 수정할 수 있습니다");
-        }
-        post.update(dto.getTitle(), dto.getContent());
-        return post;
-    }
-
     @Transactional(readOnly = true)
     public GroupPost getById(Long groupId, Long postId) {
         groupService.get(groupId);
@@ -68,6 +56,18 @@ public class GroupPostService {
     @Transactional(readOnly=true)
     public List<GroupPost> listByHost(Long hostId, Pageable pageable) {
         return postRepo.findByHostId(hostId, pageable);
+    }
+
+    public GroupPost update(Long groupId, Long postId, Long hostId, PostRequestDto dto) {
+        var post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("게시글을 찾을 수 없습니다: " + postId));
+        if (!post.getGroup().getId().equals(groupId)) {
+            throw new BadRequestException("잘못된 그룹 경로입니다");
+        }
+        if (!post.getHostId().equals(hostId)) {
+            throw new AccessDeniedException("호스트만 게시글을 수정할 수 있습니다");
+        }
+        post.update(dto.getTitle(), dto.getContent());
+        return post;
     }
 
     public void delete(Long groupId, Long postId, Long hostId) {
