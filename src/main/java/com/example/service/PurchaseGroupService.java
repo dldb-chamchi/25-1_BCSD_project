@@ -7,12 +7,13 @@ import com.example.model.PurchaseGroup;
 import com.example.repository.GroupPostRepository;
 import com.example.repository.PurchaseGroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.model.Participation;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +37,8 @@ public class PurchaseGroupService {
     }
 
     @Transactional(readOnly = true)
-    public List<PurchaseGroup> listAll() {
-        return groupRepo.findAll();
+    public Page<PurchaseGroup> listAll(Pageable pageable) {
+        return groupRepo.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
@@ -47,13 +48,13 @@ public class PurchaseGroupService {
     }
 
     @Transactional(readOnly = true)
-    public List<PurchaseGroup> listOpen() {
-        return groupRepo.findByStatus("OPEN");
+    public Page<PurchaseGroup> listOpen(Pageable pageable) {
+        return groupRepo.findByStatus("OPEN", pageable);
     }
 
     @Transactional(readOnly = true)
-    public List<PurchaseGroup> listAvailable() {
-        return groupRepo.findAvailableByStatusAndMaxMembers("OPEN");
+    public Page<PurchaseGroup> listAvailable(Pageable pageable) {
+        return groupRepo.findAvailableByStatusAndMaxMembers("OPEN", pageable);
     }
 
     public PurchaseGroup update(Long groupId, Long hostId, GroupRequestDto dto) {

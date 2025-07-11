@@ -8,6 +8,9 @@ import com.example.service.MemberService;
 import com.example.service.PurchaseGroupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/groups")
@@ -37,8 +39,10 @@ public class PurchaseGroupController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GroupResponseDto>> list() {
-        List<GroupResponseDto> dtos = groupService.listAll().stream()
+    public ResponseEntity<List<GroupResponseDto>> list(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        List<GroupResponseDto> dtos = groupService.listAll(pageable).stream()
                 .map(GroupResponseDto::fromEntity).toList();
         return ResponseEntity.ok(dtos);
     }
@@ -49,16 +53,20 @@ public class PurchaseGroupController {
     }
 
     @GetMapping("/open")
-    public ResponseEntity<List<GroupResponseDto>> listOpen() {
-        List<GroupResponseDto> dtos = groupService.listOpen().stream()
+    public ResponseEntity<List<GroupResponseDto>> listOpen(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        List<GroupResponseDto> dtos = groupService.listOpen(pageable).stream()
                 .map(GroupResponseDto::fromEntity)
                 .toList();
         return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/available")
-    public ResponseEntity<List<GroupResponseDto>> listAvailable() {
-        List<GroupResponseDto> dtos = groupService.listAvailable().stream()
+    public ResponseEntity<List<GroupResponseDto>> listAvailable(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        List<GroupResponseDto> dtos = groupService.listAvailable(pageable).stream()
                 .map(GroupResponseDto::fromEntity).toList();
         return ResponseEntity.ok(dtos);
     }
