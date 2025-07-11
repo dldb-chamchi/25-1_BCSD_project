@@ -27,14 +27,9 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     public Member register(MemberRequestDto dto) {
-        memberRepo.findByEmail(dto.getEmail())
-                .ifPresent(m -> { throw new DuplicateEmailException("이미 존재하는 이메일입니다: " + dto.getEmail()); });
-        String encoded = passwordEncoder.encode(dto.getPassword());
-        var m = Member.builder()
-                .email(dto.getEmail())
-                .password(encoded)
-                .name(dto.getName())
-                .build();
+        memberRepo.findByEmail(dto.email())
+                .ifPresent(m -> { throw new DuplicateEmailException("이미 존재하는 이메일입니다: " + dto.email()); });
+        Member m = dto.toEntity(passwordEncoder);
         return memberRepo.save(m);
     }
 

@@ -27,12 +27,7 @@ public class GroupPostService {
         PurchaseGroup g = groupService.get(groupId);
         if (!g.getHostId().equals(hostId))
             throw new BadRequestException("호스트만 게시글을 작성할 수 있습니다");
-        GroupPost p = GroupPost.builder()
-                .group(g)
-                .hostId(hostId)
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .build();
+        GroupPost p = dto.toEntity(g, hostId);
         return postRepo.save(p);
     }
 
@@ -66,7 +61,7 @@ public class GroupPostService {
         if (!post.getHostId().equals(hostId)) {
             throw new AccessDeniedException("호스트만 게시글을 수정할 수 있습니다");
         }
-        post.update(dto.getTitle(), dto.getContent());
+        post.update(dto.title(), dto.content());
         return post;
     }
 

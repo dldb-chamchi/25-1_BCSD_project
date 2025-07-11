@@ -21,17 +21,13 @@ public class PostCommentService {
     private final GroupPostRepository postRepo;
     private final ParticipationService participationService;
 
-    public PostComment create(Long postId, Long memberId, String content) {
+    public PostComment create(Long postId, Long memberId, CommentRequestDto dto) {
         var p = postRepo.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("게시글을 찾을 수 없습니다: " + postId));
         boolean isMember = participationService.listByGroup(p.getGroup().getId())
                 .stream().anyMatch(x -> x.getMemberId().equals(memberId));
         if (!isMember) throw new BadRequestException("그룹 참여자만 댓글을 달 수 있습니다");
-        var c = PostComment.builder()
-                .post(p)
-                .memberId(memberId)
-                .content(content)
-                .build();
+        PostComment c = dto.toEntity(p, memberId);
         return commentRepo.save(c);
     }
 
@@ -63,7 +59,7 @@ public class PostCommentService {
             throw new AccessDeniedException("댓글 작성자만 수정할 수 있습니다");
         }
 
-        comment.update(dto.getContent());
+        comment.update(dto.content());
         return comment;
     }
     public void delete(Long groupId, Long postId, Long commentId, Long memberId) {

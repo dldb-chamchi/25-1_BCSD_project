@@ -22,15 +22,7 @@ public class PurchaseGroupService {
     private final GroupPostRepository postRepo;
 
     public PurchaseGroup create(GroupRequestDto dto, Long hostId) {
-        PurchaseGroup group = PurchaseGroup.builder()
-                .hostId(hostId)
-                .title(dto.getTitle())
-                .description(dto.getDescription())
-                .expiresAt(dto.getExpiresAt())
-                .maxMembers(dto.getMaxMembers())
-                .createdAt(LocalDateTime.now())
-                .status("OPEN")
-                .build();
+        PurchaseGroup group = dto.toEntity(hostId);
 
         Participation hostParticipation = Participation.builder()
                 .group(group)
@@ -69,7 +61,7 @@ public class PurchaseGroupService {
         if (!g.getHostId().equals(hostId)) {
             throw new BadRequestException("호스트만 수정할 수 있습니다");
         }
-        g.update(dto.getTitle(), dto.getDescription(), dto.getMaxMembers(), dto.getExpiresAt());
+        g.update(dto.title(), dto.description(), dto.maxMembers(), dto.expiresAt());
         return g;
     }
 
