@@ -7,11 +7,11 @@ import com.example.model.PostComment;
 import com.example.repository.GroupPostRepository;
 import com.example.repository.PostCommentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,13 +32,13 @@ public class PostCommentService {
     }
 
     @Transactional(readOnly=true)
-    public List<PostComment> list(Long postId) {
-        return commentRepo.findByPostId(postId);
+    public Page<PostComment> list(Long postId, Pageable pageable) {
+        return commentRepo.findByPostId(postId, pageable);
     }
 
     @Transactional(readOnly=true)
-    public List<PostComment> listByMember(Long memberId) {
-        return commentRepo.findByMemberId(memberId);
+    public Page<PostComment> listByMember(Long memberId, Pageable pageable) {
+        return commentRepo.findByMemberId(memberId, pageable);
     }
 
     public PostComment update(

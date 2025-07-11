@@ -9,6 +9,9 @@ import com.example.service.MemberService;
 import com.example.service.PostCommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,15 +48,14 @@ public class PostCommentController {
     @GetMapping
     public ResponseEntity<List<CommentResponseDto>> list(
             @PathVariable Long groupId,
-            @PathVariable Long postId
-    ) {
-        List<CommentResponseDto> dtos = commentService.list(postId).stream()
+            @PathVariable Long postId,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        List<CommentResponseDto> dtos = commentService.list(postId, pageable).stream()
                 .filter(c -> c.getPost().getGroup().getId().equals(groupId))
                 .map(CommentResponseDto::fromEntity)
                 .toList();
         return ResponseEntity.ok(dtos);
     }
-
 
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentResponseDto> update(
