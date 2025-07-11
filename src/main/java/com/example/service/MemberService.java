@@ -10,6 +10,8 @@ import com.example.repository.MemberRepository;
 import com.example.repository.ParticipationRepository;
 import com.example.repository.PurchaseGroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,11 +59,11 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public List<PurchaseGroup> getHostGroups(Long memberId) {
+    public Page<PurchaseGroup> getHostGroups(Long memberId, Pageable pageable) {
         if (!memberRepo.existsById(memberId)) {
             throw new ResourceNotFoundException("회원이 없습니다: " + memberId);
         }
-        return groupRepo.findByHostId(memberId);
+        return groupRepo.findByHostId(memberId, pageable);
     }
 
     public void delete(Long id) {
