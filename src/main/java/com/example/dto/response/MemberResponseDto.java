@@ -1,16 +1,20 @@
-// src/main/java/com/example/dto/response/MemberResponseDto.java
 package com.example.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
+import com.example.model.Member;
 import java.time.LocalDateTime;
 
-@Getter
-@AllArgsConstructor
-public class MemberResponseDto {
-    private Long id;
-    private String email;
-    private String name;
-    private LocalDateTime createdAt;
+public record MemberResponseDto(
+        Long id,
+        String email,
+        String name,
+        LocalDateTime createdAt
+) {
+    public static MemberResponseDto fromEntity(Member m) {
+        return new MemberResponseDto(
+                m.getId(),
+                m.getEmail(),
+                m.getName(),
+                m.getCreatedAt()
+        );
+    }
 }

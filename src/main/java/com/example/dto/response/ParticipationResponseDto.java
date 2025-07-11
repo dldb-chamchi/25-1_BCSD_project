@@ -1,20 +1,20 @@
 package com.example.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import com.example.model.Participation;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ParticipationResponseDto {
-    private Long id;
-    private Long memberId;
-    private LocalDateTime joinedAt;
-    private String paymentStatus;
-
+public record ParticipationResponseDto(
+        Long id,
+        Long memberId,
+        LocalDateTime joinedAt,
+        String paymentStatus
+) {
+    public static ParticipationResponseDto fromEntity(Participation p) {
+        return new ParticipationResponseDto(
+                p.getId(),
+                p.getMemberId(),
+                p.getJoinedAt(),
+                p.getPaymentStatus()
+        );
+    }
 }

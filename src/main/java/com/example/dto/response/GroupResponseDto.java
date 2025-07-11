@@ -1,22 +1,26 @@
 package com.example.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import com.example.model.PurchaseGroup;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class GroupResponseDto {
-    private Long id;
-    private String title;
-    private String description;
-    private LocalDateTime expiresAt;
-    private Integer maxMembers;
-    private String status;
-    private Integer participantCount;
+public record GroupResponseDto(
+        Long id,
+        String title,
+        String description,
+        LocalDateTime expiresAt,
+        Integer maxMembers,
+        String status,
+        Integer participantCount
+) {
+    public static GroupResponseDto fromEntity(PurchaseGroup g) {
+        return new GroupResponseDto(
+                g.getId(),
+                g.getTitle(),
+                g.getDescription(),
+                g.getExpiresAt(),
+                g.getMaxMembers(),
+                g.getStatus(),
+                g.getParticipants().size()
+        );
+    }
 }

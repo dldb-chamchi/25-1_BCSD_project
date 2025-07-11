@@ -1,19 +1,20 @@
 package com.example.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import com.example.model.PostComment;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class CommentResponseDto {
-    private Long id;
-    private Long memberId;
-    private String content;
-    private LocalDateTime createdAt;
+public record CommentResponseDto(
+        Long id,
+        Long memberId,
+        String content,
+        LocalDateTime createdAt
+) {
+    public static CommentResponseDto fromEntity(PostComment c) {
+        return new CommentResponseDto(
+                c.getId(),
+                c.getMemberId(),
+                c.getContent(),
+                c.getCreatedAt()
+        );
+    }
 }
