@@ -33,63 +33,33 @@ public class PurchaseGroupController {
         var g = groupService.create(dto, m.getId());
         return ResponseEntity
                 .created(URI.create("/api/groups/" + g.getId()))
-                .body(new GroupResponseDto(
-                        g.getId(), g.getTitle(), g.getDescription(),
-                        g.getExpiresAt(), g.getMaxMembers(), g.getStatus(), g.getParticipants().size()
-                ));
+                .body(GroupResponseDto.fromEntity(g));
     }
 
     @GetMapping
     public ResponseEntity<List<GroupResponseDto>> list() {
         List<GroupResponseDto> dtos = groupService.listAll().stream()
-                .map(g -> new GroupResponseDto(
-                        g.getId(), g.getTitle(), g.getDescription(),
-                        g.getExpiresAt(), g.getMaxMembers(), g.getStatus(),
-                        g.getParticipants().size()))
-                .collect(Collectors.toList());
+                .map(GroupResponseDto::fromEntity).toList();
         return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GroupResponseDto> get(@PathVariable Long id) {
-        PurchaseGroup g = groupService.get(id);
-        GroupResponseDto res = new GroupResponseDto(
-                g.getId(), g.getTitle(), g.getDescription(),
-                g.getExpiresAt(), g.getMaxMembers(), g.getStatus(),
-                g.getParticipants().size()
-        );
-        return ResponseEntity.ok(res);
+        return ResponseEntity.ok(GroupResponseDto.fromEntity(groupService.get(id)));
     }
 
     @GetMapping("/open")
     public ResponseEntity<List<GroupResponseDto>> listOpen() {
         List<GroupResponseDto> dtos = groupService.listOpen().stream()
-                .map(g -> new GroupResponseDto(
-                        g.getId(),
-                        g.getTitle(),
-                        g.getDescription(),
-                        g.getExpiresAt(),
-                        g.getMaxMembers(),
-                        g.getStatus(),
-                        g.getParticipants().size()
-                ))
-                .collect(Collectors.toList());
+                .map(GroupResponseDto::fromEntity)
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/available")
     public ResponseEntity<List<GroupResponseDto>> listAvailable() {
         List<GroupResponseDto> dtos = groupService.listAvailable().stream()
-                .map(g -> new GroupResponseDto(
-                        g.getId(),
-                        g.getTitle(),
-                        g.getDescription(),
-                        g.getExpiresAt(),
-                        g.getMaxMembers(),
-                        g.getStatus(),
-                        g.getParticipants().size()
-                ))
-                .collect(Collectors.toList());
+                .map(GroupResponseDto::fromEntity).toList();
         return ResponseEntity.ok(dtos);
     }
 
@@ -101,16 +71,7 @@ public class PurchaseGroupController {
     ) {
         Member m = memberService.getByEmail(user.getUsername());
         PurchaseGroup updated = groupService.update(groupId, m.getId(), dto);
-        GroupResponseDto res = new GroupResponseDto(
-                updated.getId(),
-                updated.getTitle(),
-                updated.getDescription(),
-                updated.getExpiresAt(),
-                updated.getMaxMembers(),
-                updated.getStatus(),
-                updated.getParticipants().size()
-        );
-        return ResponseEntity.ok(res);
+        return ResponseEntity.ok(GroupResponseDto.fromEntity(updated));
     }
 
     @PatchMapping("/{groupId}/status")

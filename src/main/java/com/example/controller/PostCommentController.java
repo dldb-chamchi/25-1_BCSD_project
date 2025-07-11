@@ -32,17 +32,14 @@ public class PostCommentController {
             @Valid @RequestBody CommentRequestDto dto
     ) {
         var member = memberService.getByEmail(user.getUsername());
-        var c = commentService.create(postId, member.getId(), dto.getContent());
+        var c = commentService.create(postId, member.getId(), dto);
 
         if (!c.getPost().getGroup().getId().equals(groupId)) {
             throw new BadRequestException("잘못된 그룹 경로입니다");
         }
-        var res = new CommentResponseDto(
-                c.getId(), c.getMemberId(), c.getContent(), c.getCreatedAt()
-        );
-        return ResponseEntity
-                .created(URI.create("/api/groups/" + groupId + "/posts/" + postId + "/comments/" + c.getId()))
-                .body(res);
+        return ResponseEntity.created(
+                        URI.create("/api/groups/" + groupId + "/posts/" + postId + "/comments/" + c.getId()))
+                .body(CommentResponseDto.fromEntity(c));
     }
 
     @GetMapping
@@ -50,11 +47,9 @@ public class PostCommentController {
             @PathVariable Long groupId,
             @PathVariable Long postId
     ) {
-        var dtos = commentService.list(postId).stream()
+        List<CommentResponseDto> dtos = commentService.list(postId).stream()
                 .filter(c -> c.getPost().getGroup().getId().equals(groupId))
-                .map(c -> new CommentResponseDto(
-                        c.getId(), c.getMemberId(), c.getContent(), c.getCreatedAt()
-                ))
+                .map(CommentResponseDto::fromEntity)
                 .toList();
         return ResponseEntity.ok(dtos);
     }
@@ -73,13 +68,7 @@ public class PostCommentController {
                 groupId, postId, commentId,
                 m.getId(), dto
         );
-        CommentResponseDto res = new CommentResponseDto(
-                updated.getId(),
-                updated.getMemberId(),
-                updated.getContent(),
-                updated.getCreatedAt()
-        );
-        return ResponseEntity.ok(res);
+        return ResponseEntity.ok(CommentResponseDto.fromEntity(updated));
     }
 
     @DeleteMapping("/{commentId}")

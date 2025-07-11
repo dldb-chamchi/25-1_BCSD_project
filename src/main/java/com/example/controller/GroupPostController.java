@@ -34,8 +34,9 @@ public class GroupPostController {
     ) {
         var m = memberService.getByEmail(user.getUsername());
         var p = postService.create(groupId, m.getId(), dto);
-        return ResponseEntity.created(URI.create("/api/groups/" + groupId + "/posts/" + p.getId())).
-                body(new PostResponseDto(p.getId(), p.getHostId(), p.getTitle(), p.getContent(), p.getCreatedAt()));
+        return ResponseEntity
+                .created(URI.create("/api/groups/" + groupId + "/posts/" + p.getId()))
+                .body(PostResponseDto.fromEntity(p));
     }
 
     @GetMapping("/{postId}")
@@ -44,21 +45,16 @@ public class GroupPostController {
             @PathVariable Long postId
     ) {
         GroupPost p = postService.getById(groupId, postId);
-        PostResponseDto dto = new PostResponseDto(
-                p.getId(), p.getHostId(),
-                p.getTitle(), p.getContent(),
-                p.getCreatedAt()
-        );
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(PostResponseDto.fromEntity(p));
     }
 
     @GetMapping
     public ResponseEntity<List<PostResponseDto>> list(@PathVariable Long groupId,
                                                       @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
                                                       Pageable pageable) {
-        var dtos = postService.list(groupId, pageable).stream()
-                .map(p -> new PostResponseDto(p.getId(), p.getHostId(),
-                        p.getTitle(), p.getContent(), p.getCreatedAt())).toList();
+        List<PostResponseDto> dtos = postService.list(groupId, pageable).stream()
+                .map(PostResponseDto::fromEntity)
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
@@ -71,14 +67,7 @@ public class GroupPostController {
     ) {
         Member host = memberService.getByEmail(user.getUsername());
         GroupPost updated = postService.update(groupId, postId, host.getId(), dto);
-        PostResponseDto res = new PostResponseDto(
-                updated.getId(),
-                updated.getHostId(),
-                updated.getTitle(),
-                updated.getContent(),
-                updated.getCreatedAt()
-        );
-        return ResponseEntity.ok(res);
+        return ResponseEntity.ok(PostResponseDto.fromEntity(updated));
     }
 
     @DeleteMapping("/{postId}")

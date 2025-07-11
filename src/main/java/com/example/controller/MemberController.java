@@ -38,37 +38,23 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<MemberResponseDto> register(@Valid @RequestBody MemberRequestDto dto) {
         Member m = memberService.register(dto);
-        MemberResponseDto res = new MemberResponseDto(
-                m.getId(), m.getEmail(), m.getName(), m.getCreatedAt()
-        );
         return ResponseEntity
                 .created(URI.create("/api/members/" + m.getId()))
-                .body(res);
+                .body(MemberResponseDto.fromEntity(m));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MemberResponseDto> get(@PathVariable Long id) {
         Member m = memberService.get(id);
-        return ResponseEntity.ok(new MemberResponseDto(
-                m.getId(), m.getEmail(), m.getName(), m.getCreatedAt()
-        ));
+        return ResponseEntity.ok(MemberResponseDto.fromEntity(m));
     }
 
     @GetMapping("/{memberId}/groups")
     @Operation(summary = "단일 사용자 조회", description = "ID로 사용자 정보를 조회합니다.")
     public ResponseEntity<List<GroupResponseDto>> getJoinedGroups(@PathVariable Long memberId) {
-        List<PurchaseGroup> groups = memberService.getJoinedGroups(memberId);
-        List<GroupResponseDto> dtos = groups.stream()
-                .map(g -> new GroupResponseDto(
-                        g.getId(),
-                        g.getTitle(),
-                        g.getDescription(),
-                        g.getExpiresAt(),
-                        g.getMaxMembers(),
-                        g.getStatus(),
-                        g.getParticipants().size()
-                ))
-                .collect(Collectors.toList());
+        List<GroupResponseDto> dtos = memberService.getJoinedGroups(memberId).stream()
+                .map(GroupResponseDto::fromEntity)
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
@@ -77,21 +63,18 @@ public class MemberController {
                                                             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
                                                             Pageable pageable) {
         memberService.get(memberId);
-        var dtos = postService.listByHost(memberId, pageable).stream()
-                .map(p -> new PostResponseDto(
-                        p.getId(), p.getHostId(), p.getTitle(),
-                        p.getContent(), p.getCreatedAt()))
-                .collect(Collectors.toList());
+        List<PostResponseDto> dtos = postService.listByHost(memberId, pageable).stream()
+                .map(PostResponseDto::fromEntity)
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{memberId}/comments")
     public ResponseEntity<List<CommentResponseDto>> getMyComments(@PathVariable Long memberId) {
         memberService.get(memberId);
-        var dtos = commentService.listByMember(memberId).stream()
-                .map(c -> new CommentResponseDto(
-                        c.getId(), c.getMemberId(), c.getContent(), c.getCreatedAt()))
-                .collect(Collectors.toList());
+        List<CommentResponseDto> dtos = commentService.listByMember(memberId).stream()
+                .map(CommentResponseDto::fromEntity)
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
@@ -100,18 +83,9 @@ public class MemberController {
             @AuthenticationPrincipal UserDetails user
     ) {
         Member m = memberService.getByEmail(user.getUsername());
-        List<PurchaseGroup> groups = memberService.getJoinedGroups(m.getId());
-        List<GroupResponseDto> dtos = groups.stream()
-                .map(g -> new GroupResponseDto(
-                        g.getId(),
-                        g.getTitle(),
-                        g.getDescription(),
-                        g.getExpiresAt(),
-                        g.getMaxMembers(),
-                        g.getStatus(),
-                        g.getParticipants().size()
-                ))
-                .collect(Collectors.toList());
+        List<GroupResponseDto> dtos = memberService.getJoinedGroups(m.getId()).stream()
+                .map(GroupResponseDto::fromEntity)
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
@@ -120,18 +94,9 @@ public class MemberController {
             @AuthenticationPrincipal UserDetails user
     ) {
         Member m = memberService.getByEmail(user.getUsername());
-        List<PurchaseGroup> groups = memberService.getHostGroups(m.getId());
-        List<GroupResponseDto> dtos = groups.stream()
-                .map(g -> new GroupResponseDto(
-                        g.getId(),
-                        g.getTitle(),
-                        g.getDescription(),
-                        g.getExpiresAt(),
-                        g.getMaxMembers(),
-                        g.getStatus(),
-                        g.getParticipants().size()
-                ))
-                .collect(Collectors.toList());
+        List<GroupResponseDto> dtos = memberService.getHostGroups(m.getId()).stream()
+                .map(GroupResponseDto::fromEntity)
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
@@ -142,16 +107,9 @@ public class MemberController {
             Pageable pageable
     ) {
         Member m = memberService.getByEmail(user.getUsername());
-        var posts = postService.listByHost(m.getId(), pageable);
-        var dtos = posts.stream()
-                .map(p -> new PostResponseDto(
-                        p.getId(),
-                        p.getHostId(),
-                        p.getTitle(),
-                        p.getContent(),
-                        p.getCreatedAt()
-                ))
-                .collect(Collectors.toList());
+        List<PostResponseDto> dtos = postService.listByHost(m.getId(), pageable).stream()
+                .map(PostResponseDto::fromEntity)
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
@@ -160,15 +118,9 @@ public class MemberController {
             @AuthenticationPrincipal UserDetails user
     ) {
         Member m = memberService.getByEmail(user.getUsername());
-        var comments = commentService.listByMember(m.getId());
-        var dtos = comments.stream()
-                .map(c -> new CommentResponseDto(
-                        c.getId(),
-                        c.getMemberId(),
-                        c.getContent(),
-                        c.getCreatedAt()
-                ))
-                .collect(Collectors.toList());
+        List<CommentResponseDto> dtos = commentService.listByMember(m.getId()).stream()
+                .map(CommentResponseDto::fromEntity)
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 

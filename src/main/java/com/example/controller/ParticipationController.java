@@ -27,19 +27,16 @@ public class ParticipationController {
     ) {
         var m = memberService.getByEmail(user.getUsername());
         var p = partService.join(groupId, m.getId());
-        var res = new ParticipationResponseDto(
-                p.getId(), p.getMemberId(), p.getJoinedAt(), p.getPaymentStatus()
-        );
         return ResponseEntity.created(
-                URI.create("/api/groups/" + groupId + "/participants/" + p.getId())).body(res);
+                        URI.create("/api/groups/" + groupId + "/participants/" + p.getId()))
+                .body(ParticipationResponseDto.fromEntity(p));
     }
 
     @GetMapping
     public ResponseEntity<List<ParticipationResponseDto>> list(@PathVariable Long groupId) {
         List<ParticipationResponseDto> dtos = partService.listByGroup(groupId).stream()
-                .map(p -> new ParticipationResponseDto(
-                        p.getId(), p.getMemberId(), p.getJoinedAt(), p.getPaymentStatus()
-                )).collect(Collectors.toList());
+                .map(ParticipationResponseDto::fromEntity)
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
