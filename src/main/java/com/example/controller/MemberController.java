@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.config.AuthService;
 import com.example.dto.request.MemberRequestDto;
 import com.example.dto.response.CommentResponseDto;
 import com.example.dto.response.GroupResponseDto;
@@ -10,6 +11,7 @@ import com.example.service.GroupPostService;
 import com.example.service.MemberService;
 import com.example.service.PostCommentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +33,7 @@ public class MemberController {
     private final MemberService memberService;
     private final GroupPostService postService;
     private final PostCommentService commentService;
+    private final AuthService authService;
 
     @PostMapping
     public ResponseEntity<MemberResponseDto> register(@Valid @RequestBody MemberRequestDto dto) {
@@ -124,9 +127,11 @@ public class MemberController {
         return ResponseEntity.ok(dtos);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        memberService.delete(id);
+    @DeleteMapping
+    public ResponseEntity<Void> delete(HttpServletRequest request) {
+        Long memberId = (Long) request.getSession().getAttribute("memberId");
+        memberService.delete(memberId);
+        authService.logout(request);
         return ResponseEntity.noContent().build();
     }
 }

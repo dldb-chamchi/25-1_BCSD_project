@@ -37,13 +37,13 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public Member get(Long id) {
-        return memberRepo.findById(id)
+        return memberRepo.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("회원이 없습니다: " + id));
     }
 
     @Transactional(readOnly=true)
     public Member getByEmail(String email) {
-        return memberRepo.findByEmail(email)
+        return memberRepo.findByEmailAndDeletedFalse(email)
                 .orElseThrow(() -> new ResourceNotFoundException("회원이 없습니다: " + email));
     }
 
@@ -67,9 +67,13 @@ public class MemberService {
     }
 
     public void delete(Long id) {
-        if (!memberRepo.existsById(id)) {
-            throw new ResourceNotFoundException("회원이 없습니다: " + id);
+        Member m = memberRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("회원이 없습니다: " + id));
+        List<Participation> parts = partRepo.findByMemberId(id);
+        if (!parts.isEmpty()) {
+            partRepo.deleteAll(parts);
         }
-        memberRepo.deleteById(id);
+
+        m.deleteMember();
     }
 }

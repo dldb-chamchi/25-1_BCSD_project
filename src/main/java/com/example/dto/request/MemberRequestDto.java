@@ -21,6 +21,7 @@ public record MemberRequestDto(
                 .email(email)
                 .password(encoder.encode(password))
                 .name(name)
+                .deleted(false)
                 .build();
     }
 }

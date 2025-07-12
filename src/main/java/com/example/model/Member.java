@@ -3,7 +3,6 @@ package com.example.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -29,4 +28,11 @@ public class Member {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private boolean deleted;
+
+    public void deleteMember() {
+        this.deleted = true;
+    }
 }
