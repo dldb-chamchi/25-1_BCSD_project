@@ -21,7 +21,7 @@ public class ParticipationService {
 
     public Participation join(Long groupId, Long memberId) {
         var g = groupRepo.findById(groupId)
-                .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_DELETE_WITH_POST));
+                .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
         if ("CLOSED".equals(g.getStatus())) {
             throw new ExceptionList(ParticipationErrorCode.NOT_PARTICIPATE_GROUP_CLOSED);
         }
