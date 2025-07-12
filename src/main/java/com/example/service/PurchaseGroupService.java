@@ -1,7 +1,6 @@
 package com.example.service;
 
 import com.example.dto.request.GroupRequestDto;
-import com.example.exception.BadRequestException;
 import com.example.exception.ExceptionList;
 import com.example.exception.GroupErrorCode;
 import com.example.model.PurchaseGroup;

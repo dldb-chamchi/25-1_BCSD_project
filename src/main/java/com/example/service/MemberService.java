@@ -1,10 +1,8 @@
 package com.example.service;
 
 import com.example.dto.request.MemberRequestDto;
-import com.example.exception.DuplicateEmailException;
 import com.example.exception.ExceptionList;
 import com.example.exception.MemberErrorCode;
-import com.example.exception.ResourceNotFoundException;
 import com.example.model.Member;
 import com.example.model.Participation;
 import com.example.model.PurchaseGroup;

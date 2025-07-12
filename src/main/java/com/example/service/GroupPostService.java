@@ -4,14 +4,12 @@ import com.example.dto.request.PostRequestDto;
 import com.example.exception.BadRequestException;
 import com.example.exception.ExceptionList;
 import com.example.exception.PostErrorCode;
-import com.example.exception.ResourceNotFoundException;
 import com.example.model.GroupPost;
 import com.example.model.PurchaseGroup;
 import com.example.repository.GroupPostRepository;
 import com.example.repository.PostCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
