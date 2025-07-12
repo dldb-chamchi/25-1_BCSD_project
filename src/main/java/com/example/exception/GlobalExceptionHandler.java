@@ -78,4 +78,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
                 .body(new ErrorResponse(405, "지원하지 않는 메소드 형식입니다"));
     }
+
+    @ExceptionHandler(ExceptionList.class)
+    public ResponseEntity<ExceptionResponse> handleApplicationException(ExceptionList e) {
+        ErrorCode ec = e.getErrorCode();
+        ExceptionResponse body = new ExceptionResponse(ec.name(), ec.getMessage());
+        return new ResponseEntity<>(body, ec.getHttpStatus());
+    }
 }
