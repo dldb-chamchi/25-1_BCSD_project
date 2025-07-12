@@ -2,7 +2,8 @@ package com.example.service;
 
 import com.example.dto.request.GroupRequestDto;
 import com.example.exception.BadRequestException;
-import com.example.exception.ResourceNotFoundException;
+import com.example.exception.ExceptionList;
+import com.example.exception.GroupErrorCode;
 import com.example.model.PurchaseGroup;
 import com.example.repository.GroupPostRepository;
 import com.example.repository.PurchaseGroupRepository;
@@ -44,7 +45,7 @@ public class PurchaseGroupService {
     @Transactional(readOnly = true)
     public PurchaseGroup get(Long id) {
         return groupRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("그룹을 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
     }
 
     @Transactional(readOnly = true)
@@ -60,7 +61,7 @@ public class PurchaseGroupService {
     public PurchaseGroup update(Long groupId, Long hostId, GroupRequestDto dto) {
         PurchaseGroup g = get(groupId);
         if (!g.getHostId().equals(hostId)) {
-            throw new BadRequestException("호스트만 수정할 수 있습니다");
+            throw new ExceptionList(GroupErrorCode.HOST_ONLY_GROUP_UPDATE);
         }
         g.update(dto.title(), dto.description(), dto.maxMembers(), dto.expiresAt());
         return g;
@@ -69,7 +70,7 @@ public class PurchaseGroupService {
     public void changeStatus(Long groupId, Long hostId, String newStatus) {
         PurchaseGroup g = get(groupId);
         if (!g.getHostId().equals(hostId)) {
-            throw new BadRequestException("호스트만 상태를 변경할 수 있습니다");
+            throw new ExceptionList(GroupErrorCode.HOST_ONLY_GROUP_UPDATE);
         }
         g.updateStatus(newStatus);
     }
@@ -77,13 +78,13 @@ public class PurchaseGroupService {
     public void delete(Long id, Long hostId) {
         PurchaseGroup g = get(id);
         if (!g.getHostId().equals(hostId)) {
-            throw new BadRequestException("호스트만 삭제 가능합니다");
+            throw new ExceptionList(GroupErrorCode.HOST_ONLY_GROUP_DELETE);
         }
         if (g.getParticipants().size() > 1) {
-            throw new BadRequestException("참여자가 남아있는 그룹은 삭제할 수 없습니다");
+            throw new ExceptionList(GroupErrorCode.NOT_DELETE_WITH_PARTICIPATION);
         }
         if (postRepo.existsByGroupId(id)) {
-            throw new BadRequestException("게시글이 존재하는 그룹은 삭제할 수 없습니다");
+            throw new ExceptionList(GroupErrorCode.NOT_DELETE_WITH_POST);
         }
         groupRepo.delete(g);
     }

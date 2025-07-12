@@ -1,7 +1,6 @@
 package com.example.service;
 
-import com.example.exception.BadRequestException;
-import com.example.exception.ResourceNotFoundException;
+import com.example.exception.*;
 import com.example.model.Participation;
 import com.example.model.PurchaseGroup;
 import com.example.repository.ParticipationRepository;
@@ -22,15 +21,15 @@ public class ParticipationService {
 
     public Participation join(Long groupId, Long memberId) {
         var g = groupRepo.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException("그룹을 찾을 수 없습니다: " + groupId));
+                .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_DELETE_WITH_POST));
         if ("CLOSED".equals(g.getStatus())) {
-            throw new BadRequestException("마감된 그룹에는 더 이상 참여할 수 없습니다");
+            throw new ExceptionList(ParticipationErrorCode.NOT_PARTICIPATE_GROUP_CLOSED);
         }
         if (g.getParticipants().size() >= g.getMaxMembers()) {
-            throw new BadRequestException("모집 인원이 가득 찼습니다");
+            throw new ExceptionList(ParticipationErrorCode.LIMIT_MAX_MEMBER);
         }
         if (partRepo.existsByGroupIdAndMemberId(groupId, memberId)) {
-            throw new BadRequestException("이미 이 그룹에 참여 중입니다");
+            throw new ExceptionList(ParticipationErrorCode.ALREADY_MEMBER);
         }
         var p = Participation.builder()
                 .group(g)
@@ -51,7 +50,7 @@ public class ParticipationService {
         Participation p = partRepo.findByGroupId(groupId).stream()
                 .filter(x -> x.getMemberId().equals(memberId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("참여 내역이 없습니다"));
+                .orElseThrow(() -> new ExceptionList(ParticipationErrorCode.NOT_FOUND_PARTICIPATION));
         PurchaseGroup g = p.getGroup();
         g.removeParticipant(p);
         partRepo.delete(p);

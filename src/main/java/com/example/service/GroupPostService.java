@@ -2,6 +2,8 @@ package com.example.service;
 
 import com.example.dto.request.PostRequestDto;
 import com.example.exception.BadRequestException;
+import com.example.exception.ExceptionList;
+import com.example.exception.PostErrorCode;
 import com.example.exception.ResourceNotFoundException;
 import com.example.model.GroupPost;
 import com.example.model.PurchaseGroup;
@@ -27,7 +29,7 @@ public class GroupPostService {
         PurchaseGroup g = groupService.get(groupId);
 
         if (!g.getHostId().equals(hostId))
-            throw new BadRequestException("호스트만 게시글을 작성할 수 있습니다");
+            throw new ExceptionList(PostErrorCode.HOST_ONLY_POST_UPLOAD);
 
         GroupPost p = dto.toEntity(g, hostId);
         return postRepo.save(p);
@@ -37,7 +39,7 @@ public class GroupPostService {
     public GroupPost getById(Long groupId, Long postId) {
         groupService.get(groupId);
         GroupPost post = postRepo.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("게시글을 찾을 수 없습니다: " + postId));
+                .orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
 
         if (!post.getGroup().getId().equals(groupId)) {
             throw new BadRequestException("잘못된 그룹 경로입니다");
@@ -57,12 +59,12 @@ public class GroupPostService {
     }
 
     public GroupPost update(Long groupId, Long postId, Long hostId, PostRequestDto dto) {
-        var post = postRepo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("게시글을 찾을 수 없습니다: " + postId));
+        var post = postRepo.findById(postId).orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
         if (!post.getGroup().getId().equals(groupId)) {
             throw new BadRequestException("잘못된 그룹 경로입니다");
         }
         if (!post.getHostId().equals(hostId)) {
-            throw new AccessDeniedException("호스트만 게시글을 수정할 수 있습니다");
+            throw new ExceptionList(PostErrorCode.HOST_ONLY_POST_UPDATE);
         }
         post.update(dto.title(), dto.content());
         return post;
@@ -70,17 +72,17 @@ public class GroupPostService {
 
     public void delete(Long groupId, Long postId, Long hostId) {
         GroupPost post = postRepo.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("게시글을 찾을 수 없습니다: " + postId));
+                .orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
 
         if (!post.getGroup().getId().equals(groupId)) {
             throw new BadRequestException("잘못된 그룹 경로입니다");
         }
         if (!post.getHostId().equals(hostId)) {
-            throw new AccessDeniedException("호스트만 삭제할 수 있습니다");
+            throw new ExceptionList(PostErrorCode.HOST_ONLY_POST_DELETE);
         }
         long commentCount = commentRepo.countByPostId(postId);
         if (commentCount > 0) {
-            throw new BadRequestException("이미 댓글이 달린 게시글은 삭제할 수 없습니다");
+            throw new ExceptionList(PostErrorCode.NOT_DELETE_WITH_COMMENT);
         }
         postRepo.delete(post);
     }

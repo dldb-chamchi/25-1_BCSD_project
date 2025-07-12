@@ -2,6 +2,8 @@ package com.example.service;
 
 import com.example.dto.request.MemberRequestDto;
 import com.example.exception.DuplicateEmailException;
+import com.example.exception.ExceptionList;
+import com.example.exception.MemberErrorCode;
 import com.example.exception.ResourceNotFoundException;
 import com.example.model.Member;
 import com.example.model.Participation;
@@ -30,7 +32,7 @@ public class MemberService {
 
     public Member register(MemberRequestDto dto) {
         memberRepo.findByEmail(dto.email())
-                .ifPresent(m -> { throw new DuplicateEmailException("이미 존재하는 이메일입니다: " + dto.email()); });
+                .ifPresent(m -> { throw new ExceptionList(MemberErrorCode.DUPLICATE_EMAIL); });
         Member m = dto.toEntity(passwordEncoder);
         return memberRepo.save(m);
     }
@@ -38,19 +40,19 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Member get(Long id) {
         return memberRepo.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new ResourceNotFoundException("회원이 없습니다: " + id));
+                .orElseThrow(() -> new ExceptionList(MemberErrorCode.NOT_FOUND_USER));
     }
 
     @Transactional(readOnly=true)
     public Member getByEmail(String email) {
         return memberRepo.findByEmailAndDeletedFalse(email)
-                .orElseThrow(() -> new ResourceNotFoundException("회원이 없습니다: " + email));
+                .orElseThrow(() -> new ExceptionList(MemberErrorCode.NOT_FOUND_USER));
     }
 
     @Transactional(readOnly = true)
     public List<PurchaseGroup> getJoinedGroups(Long memberId) {
         if(!memberRepo.existsById(memberId)) {
-            throw new ResourceNotFoundException("회원이 없습니다: " + memberId);
+            throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
         }
         List<Participation> parts = partRepo.findByMemberId(memberId);
         return parts.stream()
@@ -61,19 +63,18 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Page<PurchaseGroup> getHostGroups(Long memberId, Pageable pageable) {
         if (!memberRepo.existsById(memberId)) {
-            throw new ResourceNotFoundException("회원이 없습니다: " + memberId);
+            throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
         }
         return groupRepo.findByHostId(memberId, pageable);
     }
 
     public void delete(Long id) {
         Member m = memberRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("회원이 없습니다: " + id));
+                .orElseThrow(() -> new ExceptionList(MemberErrorCode.NOT_FOUND_USER));
         List<Participation> parts = partRepo.findByMemberId(id);
         if (!parts.isEmpty()) {
             partRepo.deleteAll(parts);
         }
-
         m.deleteMember();
     }
 }
