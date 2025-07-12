@@ -25,8 +25,10 @@ public class GroupPostService {
 
     public GroupPost create(Long groupId, Long hostId, PostRequestDto dto) {
         PurchaseGroup g = groupService.get(groupId);
+
         if (!g.getHostId().equals(hostId))
             throw new BadRequestException("호스트만 게시글을 작성할 수 있습니다");
+
         GroupPost p = dto.toEntity(g, hostId);
         return postRepo.save(p);
     }
@@ -36,6 +38,7 @@ public class GroupPostService {
         groupService.get(groupId);
         GroupPost post = postRepo.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("게시글을 찾을 수 없습니다: " + postId));
+
         if (!post.getGroup().getId().equals(groupId)) {
             throw new BadRequestException("잘못된 그룹 경로입니다");
         }

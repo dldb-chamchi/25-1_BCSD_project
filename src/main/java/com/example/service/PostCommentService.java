@@ -24,9 +24,12 @@ public class PostCommentService {
     public PostComment create(Long postId, Long memberId, CommentRequestDto dto) {
         var p = postRepo.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("게시글을 찾을 수 없습니다: " + postId));
+
         boolean isMember = participationService.listByGroup(p.getGroup().getId())
                 .stream().anyMatch(x -> x.getMemberId().equals(memberId));
+
         if (!isMember) throw new BadRequestException("그룹 참여자만 댓글을 달 수 있습니다");
+
         PostComment c = dto.toEntity(p, memberId);
         return commentRepo.save(c);
     }

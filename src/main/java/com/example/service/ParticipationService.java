@@ -57,4 +57,3 @@ public class ParticipationService {
         partRepo.delete(p);
     }
 }
-
