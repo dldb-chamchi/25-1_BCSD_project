@@ -1,5 +1,6 @@
 package com.example.config;
 
+import com.example.auth.MemberDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpStatus;
@@ -9,10 +10,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.*;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -36,24 +36,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JsonUsernamePasswordAuthenticationFilter jsonLoginFilter() throws Exception {
-        var filter = new JsonUsernamePasswordAuthenticationFilter(
-                "/auth/login", authenticationManager()
-        );
-
-        filter.setAuthenticationSuccessHandler((req, res, auth) ->
-                res.setStatus(HttpStatus.OK.value())
-        );
-
-        filter.setAuthenticationFailureHandler((req, res, ex) ->
-                res.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage())
-        );
-        return filter;
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                )
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/auth/**", "/api/members",
@@ -63,11 +50,6 @@ public class SecurityConfig {
                                         "/swagger-ui/index.html",
                                         "/webjars/**").permitAll()
                         .anyRequest().authenticated()
-                )
-                .formLogin(AbstractHttpConfigurer::disable)
-                .addFilterAt(jsonLoginFilter(), UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement(sess ->
-                        sess.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/auth/logout")
