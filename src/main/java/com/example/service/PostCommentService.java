@@ -2,6 +2,8 @@ package com.example.service;
 
 import com.example.dto.request.CommentRequestDto;
 import com.example.exception.*;
+import com.example.exception.errorCode.CommentErrorCode;
+import com.example.exception.errorCode.PostErrorCode;
 import com.example.model.PostComment;
 import com.example.repository.GroupPostRepository;
 import com.example.repository.PostCommentRepository;

@@ -1,6 +1,8 @@
 package com.example.model;
 
 import com.example.exception.BadRequestException;
+import com.example.exception.ExceptionList;
+import com.example.exception.errorCode.GroupErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -58,7 +60,7 @@ public class PurchaseGroup {
 
     public void updateStatus(String newStatus) {
         if (!List.of("OPEN","CLOSED").contains(newStatus)) {
-            throw new BadRequestException("유효한 상태가 아닙니다");
+            throw new ExceptionList(GroupErrorCode.NOT_VALID_STATUS);
         }
         this.status = newStatus;
     }

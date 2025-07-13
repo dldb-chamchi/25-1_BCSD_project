@@ -1,6 +1,8 @@
 package com.example.service;
 
 import com.example.exception.*;
+import com.example.exception.errorCode.GroupErrorCode;
+import com.example.exception.errorCode.ParticipationErrorCode;
 import com.example.model.Participation;
 import com.example.model.PurchaseGroup;
 import com.example.repository.ParticipationRepository;

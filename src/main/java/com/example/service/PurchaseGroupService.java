@@ -2,7 +2,7 @@ package com.example.service;
 
 import com.example.dto.request.GroupRequestDto;
 import com.example.exception.ExceptionList;
-import com.example.exception.GroupErrorCode;
+import com.example.exception.errorCode.GroupErrorCode;
 import com.example.model.PurchaseGroup;
 import com.example.repository.GroupPostRepository;
 import com.example.repository.PurchaseGroupRepository;

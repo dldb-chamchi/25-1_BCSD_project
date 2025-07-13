@@ -3,7 +3,7 @@ package com.example.service;
 import com.example.dto.request.PostRequestDto;
 import com.example.exception.BadRequestException;
 import com.example.exception.ExceptionList;
-import com.example.exception.PostErrorCode;
+import com.example.exception.errorCode.PostErrorCode;
 import com.example.model.GroupPost;
 import com.example.model.PurchaseGroup;
 import com.example.repository.GroupPostRepository;

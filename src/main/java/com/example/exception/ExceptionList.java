@@ -1,5 +1,6 @@
 package com.example.exception;
 
+import com.example.exception.errorCode.ErrorCode;
 import lombok.Getter;
 
 @Getter
