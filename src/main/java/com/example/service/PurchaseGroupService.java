@@ -29,7 +29,6 @@ public class PurchaseGroupService {
                 .group(group)
                 .memberId(hostId)
                 .joinedAt(LocalDateTime.now())
-                .paymentStatus("PENDING")
                 .build();
         group.addParticipant(hostParticipation);
 

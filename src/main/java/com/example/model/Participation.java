@@ -23,7 +23,4 @@ public class Participation {
 
     @Column(name = "joined_at", nullable = false)
     private LocalDateTime joinedAt;
-
-    @Column(name = "payment_status", nullable = false, length = 20)
-    private String paymentStatus;
 }

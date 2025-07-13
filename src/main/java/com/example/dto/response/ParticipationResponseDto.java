@@ -6,15 +6,13 @@ import java.time.LocalDateTime;
 public record ParticipationResponseDto(
         Long id,
         Long memberId,
-        LocalDateTime joinedAt,
-        String paymentStatus
+        LocalDateTime joinedAt
 ) {
     public static ParticipationResponseDto fromEntity(Participation p) {
         return new ParticipationResponseDto(
                 p.getId(),
                 p.getMemberId(),
-                p.getJoinedAt(),
-                p.getPaymentStatus()
+                p.getJoinedAt()
         );
     }
 }

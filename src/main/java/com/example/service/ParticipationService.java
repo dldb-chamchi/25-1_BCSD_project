@@ -37,7 +37,6 @@ public class ParticipationService {
                 .group(g)
                 .memberId(memberId)
                 .joinedAt(LocalDateTime.now())
-                .paymentStatus("PENDING")
                 .build();
         g.addParticipant(p);
         return partRepo.save(p);
