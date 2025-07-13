@@ -1,4 +1,4 @@
-package com.example.exception;
+package com.example.exception.errorCode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
