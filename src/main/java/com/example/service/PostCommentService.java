@@ -3,6 +3,7 @@ package com.example.service;
 import com.example.dto.request.CommentRequestDto;
 import com.example.exception.*;
 import com.example.exception.errorCode.CommentErrorCode;
+import com.example.exception.errorCode.PathErrorCode;
 import com.example.exception.errorCode.PostErrorCode;
 import com.example.model.PostComment;
 import com.example.repository.GroupPostRepository;
@@ -56,7 +57,7 @@ public class PostCommentService {
 
         if (!comment.getPost().getId().equals(postId)
                 || !comment.getPost().getGroup().getId().equals(groupId)) {
-            throw new BadRequestException("잘못된 경로(groupId/postId) 입니다");
+            throw new ExceptionList(PathErrorCode.NOT_VALID_PATH);
         }
         if (!comment.getMemberId().equals(memberId)) {
             throw new ExceptionList(CommentErrorCode.ONLY_WRITER_MEMBER_UPDATE);
@@ -71,7 +72,7 @@ public class PostCommentService {
 
         if (!c.getPost().getId().equals(postId)
                 || !c.getPost().getGroup().getId().equals(groupId)) {
-            throw new BadRequestException("잘못된 경로입니다");
+            throw new ExceptionList(PathErrorCode.NOT_VALID_PATH);
         }
         if (!c.getMemberId().equals(memberId)) {
             throw new ExceptionList(CommentErrorCode.ONLY_WRITER_MEMBER_DELETE);

@@ -1,8 +1,8 @@
 package com.example.service;
 
 import com.example.dto.request.PostRequestDto;
-import com.example.exception.BadRequestException;
 import com.example.exception.ExceptionList;
+import com.example.exception.errorCode.PathErrorCode;
 import com.example.exception.errorCode.PostErrorCode;
 import com.example.model.GroupPost;
 import com.example.model.PurchaseGroup;
@@ -40,7 +40,7 @@ public class GroupPostService {
                 .orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
 
         if (!post.getGroup().getId().equals(groupId)) {
-            throw new BadRequestException("잘못된 그룹 경로입니다");
+            throw new ExceptionList(PathErrorCode.NOT_VALID_PATH);
         }
         return post;
     }
@@ -59,7 +59,7 @@ public class GroupPostService {
     public GroupPost update(Long groupId, Long postId, Long hostId, PostRequestDto dto) {
         var post = postRepo.findById(postId).orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
         if (!post.getGroup().getId().equals(groupId)) {
-            throw new BadRequestException("잘못된 그룹 경로입니다");
+            throw new ExceptionList(PathErrorCode.NOT_VALID_PATH);
         }
         if (!post.getHostId().equals(hostId)) {
             throw new ExceptionList(PostErrorCode.HOST_ONLY_POST_UPDATE);
@@ -73,7 +73,7 @@ public class GroupPostService {
                 .orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
 
         if (!post.getGroup().getId().equals(groupId)) {
-            throw new BadRequestException("잘못된 그룹 경로입니다");
+            throw new ExceptionList(PathErrorCode.NOT_VALID_PATH);
         }
         if (!post.getHostId().equals(hostId)) {
             throw new ExceptionList(PostErrorCode.HOST_ONLY_POST_DELETE);
