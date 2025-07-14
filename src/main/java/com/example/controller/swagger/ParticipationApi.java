@@ -33,9 +33,9 @@ public interface ParticipationApi {
 
     @Operation(summary = "그룹 떠나기", description = "그룹 참여자만 가능합니다")
     @ApiResponse(responseCode = "200", description = "그룹 떠나기 성공", content = @Content(mediaType = "application/json"))
-    @DeleteMapping("/{memberId}")
+    @DeleteMapping
     ResponseEntity<Void> leave(
             @PathVariable Long groupId,
-            @PathVariable Long memberId
+            @AuthenticationPrincipal UserDetails user
     );
 }
