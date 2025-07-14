@@ -7,6 +7,7 @@ import com.example.exception.errorCode.PathErrorCode;
 import com.example.exception.errorCode.PostErrorCode;
 import com.example.model.PostComment;
 import com.example.repository.GroupPostRepository;
+import com.example.repository.ParticipationRepository;
 import com.example.repository.PostCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,14 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostCommentService {
     private final PostCommentRepository commentRepo;
     private final GroupPostRepository postRepo;
-    private final ParticipationService participationService;
+    private final ParticipationRepository partRepo;
 
     public PostComment create(Long postId, Long memberId, CommentRequestDto dto) {
         var p = postRepo.findById(postId)
                 .orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
 
-        boolean isMember = participationService.listByGroup(p.getGroup().getId())
-                .stream().anyMatch(x -> x.getMemberId().equals(memberId));
+        boolean isMember = partRepo.existsByGroupIdAndMemberId(
+                p.getGroup().getId(), memberId
+        );
 
         if (!isMember) throw new ExceptionList(CommentErrorCode.ONLY_GROUP_MEMBER);
 
