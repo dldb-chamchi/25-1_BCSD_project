@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.controller.swagger.PostApi;
 import com.example.dto.request.PostRequestDto;
 import com.example.dto.response.PostResponseDto;
 import com.example.model.GroupPost;
@@ -22,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/groups/{groupId}/posts")
 @RequiredArgsConstructor
-public class GroupPostController {
+public class GroupPostController implements PostApi {
     private final GroupPostService postService;
     private final MemberService memberService;
 

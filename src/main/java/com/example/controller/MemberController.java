@@ -1,6 +1,7 @@
 package com.example.controller;
 
-import com.example.config.AuthService;
+import com.example.auth.AuthService;
+import com.example.controller.swagger.MemberApi;
 import com.example.dto.request.MemberRequestDto;
 import com.example.dto.response.CommentResponseDto;
 import com.example.dto.response.GroupResponseDto;
@@ -29,7 +30,7 @@ import java.util.List;
 @RequestMapping("/api/members")
 @RequiredArgsConstructor
 @Tag(name = "User", description = "사용자 관련 API")
-public class MemberController {
+public class MemberController implements MemberApi {
     private final MemberService memberService;
     private final GroupPostService postService;
     private final PostCommentService commentService;

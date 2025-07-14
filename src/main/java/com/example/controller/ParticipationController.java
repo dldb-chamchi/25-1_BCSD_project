@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.controller.swagger.ParticipationApi;
 import com.example.dto.response.ParticipationResponseDto;
 import com.example.service.MemberService;
 import com.example.service.ParticipationService;
@@ -15,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/groups/{groupId}/participants")
 @RequiredArgsConstructor
-public class ParticipationController {
+public class ParticipationController implements ParticipationApi {
     private final ParticipationService partService;
     private final MemberService memberService;
 
@@ -39,8 +40,10 @@ public class ParticipationController {
         return ResponseEntity.ok(dtos);
     }
 
-    @DeleteMapping("/{memberId}")
-    public ResponseEntity<Void> leave(@PathVariable Long groupId, @PathVariable Long memberId) {
+    @DeleteMapping
+    public ResponseEntity<Void> leave(@PathVariable Long groupId,
+                                      @AuthenticationPrincipal UserDetails user) {
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
         partService.leave(groupId, memberId);
         return ResponseEntity.noContent().build();
     }

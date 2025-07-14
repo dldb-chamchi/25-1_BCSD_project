@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.controller.swagger.CommentApi;
 import com.example.dto.request.CommentRequestDto;
 import com.example.dto.response.CommentResponseDto;
 import com.example.exception.BadRequestException;
@@ -23,7 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/groups/{groupId}/posts/{postId}/comments")
 @RequiredArgsConstructor
-public class PostCommentController {
+public class PostCommentController implements CommentApi {
     private final PostCommentService commentService;
     private final MemberService memberService;
 

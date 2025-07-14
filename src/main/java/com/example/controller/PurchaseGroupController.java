@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.controller.swagger.GroupApi;
 import com.example.dto.request.GroupRequestDto;
 import com.example.dto.response.GroupResponseDto;
 import com.example.model.Member;
@@ -22,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/groups")
 @RequiredArgsConstructor
-public class PurchaseGroupController {
+public class PurchaseGroupController implements GroupApi {
     private final PurchaseGroupService groupService;
     private final MemberService memberService;
 
