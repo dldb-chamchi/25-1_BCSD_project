@@ -1,4 +1,4 @@
-package com.example.config;
+package com.example.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
