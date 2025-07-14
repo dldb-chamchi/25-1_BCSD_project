@@ -53,6 +53,9 @@ public class ParticipationService {
                 .findFirst()
                 .orElseThrow(() -> new ExceptionList(ParticipationErrorCode.NOT_FOUND_PARTICIPATION));
         PurchaseGroup g = p.getGroup();
+        if (g.getHostId().equals(memberId)) {
+            throw new ExceptionList(ParticipationErrorCode.NOT_LEAVE_HOST);
+        }
         g.removeParticipant(p);
         partRepo.delete(p);
     }
