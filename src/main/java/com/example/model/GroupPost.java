@@ -34,6 +34,7 @@ public class GroupPost {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostComment> comments = new ArrayList<>();
 
