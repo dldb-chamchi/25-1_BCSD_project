@@ -1,6 +1,5 @@
 package com.example.model;
 
-import com.example.exception.BadRequestException;
 import com.example.exception.ExceptionList;
 import com.example.exception.errorCode.GroupErrorCode;
 import jakarta.persistence.*;
