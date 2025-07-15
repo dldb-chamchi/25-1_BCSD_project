@@ -1,6 +1,7 @@
 package com.example.controller.swagger;
 
 import com.example.dto.request.GroupRequestDto;
+import com.example.dto.request.UpdateStatusDto;
 import com.example.dto.response.GroupResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -75,7 +76,7 @@ public interface GroupApi {
     ResponseEntity<Void> patchStatus(
             @PathVariable Long groupId,
             @AuthenticationPrincipal UserDetails user,
-            @RequestParam("status") String status
+            @Valid @RequestBody UpdateStatusDto dto
     );
 
     @Operation(summary = "그룹 삭제", description = "호스트만 가능합니다")

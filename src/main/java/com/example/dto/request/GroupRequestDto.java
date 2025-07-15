@@ -1,5 +1,6 @@
 package com.example.dto.request;
 
+import com.example.model.PurchaseGroupStatus;
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import com.example.model.PurchaseGroup;
@@ -30,7 +31,7 @@ public record GroupRequestDto(
                 .expiresAt(expiresAt)
                 .maxMembers(maxMembers)
                 .createdAt(LocalDateTime.now())
-                .status("OPEN")
+                .status(PurchaseGroupStatus.OPEN)
                 .build();
     }
 }

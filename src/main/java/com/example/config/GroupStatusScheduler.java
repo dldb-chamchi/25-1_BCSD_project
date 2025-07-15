@@ -1,6 +1,7 @@
 package com.example.config;
 
 import com.example.model.PurchaseGroup;
+import com.example.model.PurchaseGroupStatus;
 import com.example.repository.PurchaseGroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,8 +22,10 @@ public class GroupStatusScheduler {
     @Transactional
     public void closeExpiredGroups() {
         List<PurchaseGroup> expired = groupRepo
-                .findByStatusAndExpiresAtBefore("OPEN", LocalDateTime.now());
-        expired.forEach(g -> g.updateStatus("CLOSED"));
+                .findByStatusAndExpiresAtBefore(PurchaseGroupStatus.OPEN, LocalDateTime.now());
+
+        expired.forEach(group ->
+                group.updateStatus(PurchaseGroupStatus.CLOSED));
         groupRepo.saveAll(expired);
     }
 }

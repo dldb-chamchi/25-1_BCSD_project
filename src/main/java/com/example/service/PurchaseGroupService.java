@@ -1,10 +1,12 @@
 package com.example.service;
 
 import com.example.dto.request.GroupRequestDto;
+import com.example.dto.request.UpdateStatusDto;
 import com.example.dto.response.GroupResponseDto;
 import com.example.exception.ExceptionList;
 import com.example.exception.errorCode.GroupErrorCode;
 import com.example.model.PurchaseGroup;
+import com.example.model.PurchaseGroupStatus;
 import com.example.repository.GroupPostRepository;
 import com.example.repository.PurchaseGroupRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,14 +53,14 @@ public class PurchaseGroupService {
 
     @Transactional(readOnly = true)
     public Page<GroupResponseDto> listOpen(Pageable pageable) {
-        return groupRepo.findByStatus("OPEN", pageable)
+        return groupRepo.findByStatus(PurchaseGroupStatus.OPEN, pageable)
                 .map(GroupResponseDto::fromEntity);
     }
 
     @Transactional(readOnly = true)
     public Page<GroupResponseDto> listAvailable(Pageable pageable) {
-        return groupRepo.findAvailableByStatusAndMaxMembers("OPEN", pageable)
-            .map(GroupResponseDto::fromEntity);
+        return groupRepo.findAvailableByStatusAndMaxMembers(PurchaseGroupStatus.OPEN, pageable)
+                .map(GroupResponseDto::fromEntity);
     }
 
     public GroupResponseDto update(Long groupId, Long hostId, GroupRequestDto dto) {
@@ -73,7 +75,7 @@ public class PurchaseGroupService {
         return GroupResponseDto.fromEntity(group);
     }
 
-    public void changeStatus(Long groupId, Long hostId, String newStatus) {
+    public void changeStatus(Long groupId, Long hostId, UpdateStatusDto dto) {
         PurchaseGroup group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
 
@@ -81,6 +83,12 @@ public class PurchaseGroupService {
             throw new ExceptionList(GroupErrorCode.HOST_ONLY_GROUP_UPDATE);
         }
 
+        PurchaseGroupStatus newStatus = dto.status();
+
+        if (newStatus == PurchaseGroupStatus.OPEN
+                && group.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ExceptionList(GroupErrorCode.NOT_VALID_STATUS);
+        }
         group.updateStatus(newStatus);
     }
 

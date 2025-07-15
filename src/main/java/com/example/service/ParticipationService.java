@@ -6,6 +6,7 @@ import com.example.exception.errorCode.GroupErrorCode;
 import com.example.exception.errorCode.ParticipationErrorCode;
 import com.example.model.Participation;
 import com.example.model.PurchaseGroup;
+import com.example.model.PurchaseGroupStatus;
 import com.example.repository.ParticipationRepository;
 import com.example.repository.PurchaseGroupRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class ParticipationService {
         PurchaseGroup group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
 
-        if ("CLOSED".equals(group.getStatus())) {
+        if (group.getStatus() == PurchaseGroupStatus.CLOSED) {
             throw new ExceptionList(ParticipationErrorCode.NOT_PARTICIPATE_GROUP_CLOSED);
         }
         if (group.getParticipants().size() >= group.getMaxMembers()) {

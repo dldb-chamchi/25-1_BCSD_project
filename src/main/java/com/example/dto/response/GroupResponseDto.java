@@ -1,6 +1,8 @@
 package com.example.dto.response;
 
 import com.example.model.PurchaseGroup;
+import com.example.model.PurchaseGroupStatus;
+
 import java.time.LocalDateTime;
 
 public record GroupResponseDto(
@@ -9,7 +11,7 @@ public record GroupResponseDto(
         String description,
         LocalDateTime expiresAt,
         Integer maxMembers,
-        String status,
+        PurchaseGroupStatus status,
         Integer participantCount
 ) {
     public static GroupResponseDto fromEntity(PurchaseGroup g) {

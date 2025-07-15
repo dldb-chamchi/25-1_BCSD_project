@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.controller.swagger.GroupApi;
 import com.example.dto.request.GroupRequestDto;
+import com.example.dto.request.UpdateStatusDto;
 import com.example.dto.response.GroupResponseDto;
 import com.example.service.MemberService;
 import com.example.service.PurchaseGroupService;
@@ -78,10 +79,10 @@ public class PurchaseGroupController implements GroupApi {
     public ResponseEntity<Void> patchStatus(
             @PathVariable Long groupId,
             @AuthenticationPrincipal UserDetails user,
-            @RequestParam("status") String status
-    ) {
+            @Valid @RequestBody UpdateStatusDto dto
+            ) {
         Long memberId = memberService.getByEmail(user.getUsername()).getId();
-        groupService.changeStatus(groupId, memberId, status.toUpperCase());
+        groupService.changeStatus(groupId, memberId, dto);
         return ResponseEntity.noContent().build();
     }
 

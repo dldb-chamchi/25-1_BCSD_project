@@ -1,7 +1,5 @@
 package com.example.model;
 
-import com.example.exception.ExceptionList;
-import com.example.exception.errorCode.GroupErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -42,8 +40,9 @@ public class PurchaseGroup {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String status;
+    private PurchaseGroupStatus status;
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
 
@@ -57,10 +56,7 @@ public class PurchaseGroup {
             this.expiresAt = newExpiresAt;
     }
 
-    public void updateStatus(String newStatus) {
-        if (!List.of("OPEN","CLOSED").contains(newStatus)) {
-            throw new ExceptionList(GroupErrorCode.NOT_VALID_STATUS);
-        }
+    public void updateStatus(PurchaseGroupStatus newStatus) {
         this.status = newStatus;
     }
 
