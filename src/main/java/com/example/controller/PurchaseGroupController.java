@@ -3,8 +3,6 @@ package com.example.controller;
 import com.example.controller.swagger.GroupApi;
 import com.example.dto.request.GroupRequestDto;
 import com.example.dto.response.GroupResponseDto;
-import com.example.model.Member;
-import com.example.model.PurchaseGroup;
 import com.example.service.MemberService;
 import com.example.service.PurchaseGroupService;
 import jakarta.validation.Valid;
@@ -32,44 +30,37 @@ public class PurchaseGroupController implements GroupApi {
             @RequestBody GroupRequestDto dto,
             @AuthenticationPrincipal UserDetails user
     ) {
-        var m = memberService.getByEmail(user.getUsername());
-        var g = groupService.create(dto, m.getId());
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        GroupResponseDto response = groupService.create(dto, memberId);
         return ResponseEntity
-                .created(URI.create("/api/groups/" + g.getId()))
-                .body(GroupResponseDto.fromEntity(g));
+                .created(URI.create("/api/groups/" + response.id()))
+                .body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<GroupResponseDto>> list(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable) {
-        List<GroupResponseDto> dtos = groupService.listAll(pageable).stream()
-                .map(GroupResponseDto::fromEntity).toList();
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(groupService.listAll(pageable).getContent());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GroupResponseDto> get(@PathVariable Long id) {
-        return ResponseEntity.ok(GroupResponseDto.fromEntity(groupService.get(id)));
+        return ResponseEntity.ok(groupService.get(id));
     }
 
     @GetMapping("/open")
     public ResponseEntity<List<GroupResponseDto>> listOpen(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable) {
-        List<GroupResponseDto> dtos = groupService.listOpen(pageable).stream()
-                .map(GroupResponseDto::fromEntity)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(groupService.listOpen(pageable).getContent());
     }
 
     @GetMapping("/available")
     public ResponseEntity<List<GroupResponseDto>> listAvailable(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable) {
-        List<GroupResponseDto> dtos = groupService.listAvailable(pageable).stream()
-                .map(GroupResponseDto::fromEntity).toList();
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(groupService.listAvailable(pageable).getContent());
     }
 
     @PutMapping("/{groupId}")
@@ -78,9 +69,9 @@ public class PurchaseGroupController implements GroupApi {
             @AuthenticationPrincipal UserDetails user,
             @Valid @RequestBody GroupRequestDto dto
     ) {
-        Member m = memberService.getByEmail(user.getUsername());
-        PurchaseGroup updated = groupService.update(groupId, m.getId(), dto);
-        return ResponseEntity.ok(GroupResponseDto.fromEntity(updated));
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        GroupResponseDto updated = groupService.update(groupId, memberId, dto);
+        return ResponseEntity.ok(updated);
     }
 
     @PatchMapping("/{groupId}/status")
@@ -89,8 +80,8 @@ public class PurchaseGroupController implements GroupApi {
             @AuthenticationPrincipal UserDetails user,
             @RequestParam("status") String status
     ) {
-        var m = memberService.getByEmail(user.getUsername());
-        groupService.changeStatus(groupId, m.getId(), status.toUpperCase());
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        groupService.changeStatus(groupId, memberId, status.toUpperCase());
         return ResponseEntity.noContent().build();
     }
 
@@ -99,8 +90,8 @@ public class PurchaseGroupController implements GroupApi {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails user
     ) {
-        var m = memberService.getByEmail(user.getUsername());
-        groupService.delete(id, m.getId());
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        groupService.delete(id, memberId);
         return ResponseEntity.noContent().build();
     }
 }

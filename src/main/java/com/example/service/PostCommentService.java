@@ -1,10 +1,12 @@
 package com.example.service;
 
 import com.example.dto.request.CommentRequestDto;
+import com.example.dto.response.CommentResponseDto;
 import com.example.exception.*;
 import com.example.exception.errorCode.CommentErrorCode;
 import com.example.exception.errorCode.PathErrorCode;
 import com.example.exception.errorCode.PostErrorCode;
+import com.example.model.GroupPost;
 import com.example.model.PostComment;
 import com.example.repository.GroupPostRepository;
 import com.example.repository.ParticipationRepository;
@@ -23,31 +25,26 @@ public class PostCommentService {
     private final GroupPostRepository postRepo;
     private final ParticipationRepository partRepo;
 
-    public PostComment create(Long postId, Long memberId, CommentRequestDto dto) {
-        var p = postRepo.findById(postId)
+    public CommentResponseDto create(Long postId, Long memberId, CommentRequestDto dto) {
+        GroupPost post = postRepo.findById(postId)
                 .orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
 
         boolean isMember = partRepo.existsByGroupIdAndMemberId(
-                p.getGroup().getId(), memberId
-        );
+                post.getGroup().getId(), memberId);
 
         if (!isMember) throw new ExceptionList(CommentErrorCode.ONLY_GROUP_MEMBER);
 
-        PostComment c = dto.toEntity(p, memberId);
-        return commentRepo.save(c);
+        PostComment comment = dto.toEntity(post, memberId);
+        return CommentResponseDto.fromEntity(commentRepo.save(comment));
     }
 
     @Transactional(readOnly=true)
-    public Page<PostComment> list(Long postId, Pageable pageable) {
-        return commentRepo.findByPostId(postId, pageable);
+    public Page<CommentResponseDto> list(Long postId, Pageable pageable) {
+        return commentRepo.findByPostId(postId, pageable)
+                .map(CommentResponseDto::fromEntity);
     }
 
-    @Transactional(readOnly=true)
-    public Page<PostComment> listByMember(Long memberId, Pageable pageable) {
-        return commentRepo.findByMemberId(memberId, pageable);
-    }
-
-    public PostComment update(
+    public CommentResponseDto update(
             Long groupId,
             Long postId,
             Long commentId,
@@ -66,19 +63,19 @@ public class PostCommentService {
         }
 
         comment.update(dto.content());
-        return comment;
+        return CommentResponseDto.fromEntity(comment);
     }
     public void delete(Long groupId, Long postId, Long commentId, Long memberId) {
-        PostComment c = commentRepo.findById(commentId)
+        PostComment comment = commentRepo.findById(commentId)
                 .orElseThrow(() -> new ExceptionList(CommentErrorCode.NOT_FOUND_COMMENT));
 
-        if (!c.getPost().getId().equals(postId)
-                || !c.getPost().getGroup().getId().equals(groupId)) {
+        if (!comment.getPost().getId().equals(postId)
+                || !comment.getPost().getGroup().getId().equals(groupId)) {
             throw new ExceptionList(PathErrorCode.NOT_VALID_PATH);
         }
-        if (!c.getMemberId().equals(memberId)) {
+        if (!comment.getMemberId().equals(memberId)) {
             throw new ExceptionList(CommentErrorCode.ONLY_WRITER_MEMBER_DELETE);
         }
-        commentRepo.delete(c);
+        commentRepo.delete(comment);
     }
 }

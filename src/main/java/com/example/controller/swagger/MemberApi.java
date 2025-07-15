@@ -44,14 +44,14 @@ public interface MemberApi {
     @Operation(summary = "멤버가 쓴 게시글 조회")
     @ApiResponse(responseCode = "200", description = "게시글 조회 성공", content = @Content(mediaType = "application/json"))
     @GetMapping("/{memberId}/posts")
-    ResponseEntity<List<PostResponseDto>> getMyPosts(@PathVariable Long memberId,
-                                                            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+    ResponseEntity<List<PostResponseDto>> getMemberPosts(@PathVariable Long memberId,
+                                                     @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
                                                             Pageable pageable);
 
     @Operation(summary = "멤버가 쓴 댓글 조회")
     @ApiResponse(responseCode = "200", description = "댓글 조회 성공", content = @Content(mediaType = "application/json"))
     @GetMapping("/{memberId}/comments")
-    ResponseEntity<List<CommentResponseDto>> getMyComments(@PathVariable Long memberId,
+    ResponseEntity<List<CommentResponseDto>> getMemberComments(@PathVariable Long memberId,
                                                                   @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
                                                                   Pageable pageable);
 

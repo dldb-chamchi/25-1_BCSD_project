@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.dto.response.ParticipationResponseDto;
 import com.example.exception.*;
 import com.example.exception.errorCode.GroupErrorCode;
 import com.example.exception.errorCode.ParticipationErrorCode;
@@ -21,42 +22,49 @@ public class ParticipationService {
     private final ParticipationRepository partRepo;
     private final PurchaseGroupRepository groupRepo;
 
-    public Participation join(Long groupId, Long memberId) {
-        var g = groupRepo.findById(groupId)
+    public ParticipationResponseDto join(Long groupId, Long memberId) {
+        PurchaseGroup group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
-        if ("CLOSED".equals(g.getStatus())) {
+
+        if ("CLOSED".equals(group.getStatus())) {
             throw new ExceptionList(ParticipationErrorCode.NOT_PARTICIPATE_GROUP_CLOSED);
         }
-        if (g.getParticipants().size() >= g.getMaxMembers()) {
+        if (group.getParticipants().size() >= group.getMaxMembers()) {
             throw new ExceptionList(ParticipationErrorCode.LIMIT_MAX_MEMBER);
         }
         if (partRepo.existsByGroupIdAndMemberId(groupId, memberId)) {
             throw new ExceptionList(ParticipationErrorCode.ALREADY_MEMBER);
         }
-        var p = Participation.builder()
-                .group(g)
+
+        Participation participation = Participation.builder()
+                .group(group)
                 .memberId(memberId)
                 .joinedAt(LocalDateTime.now())
                 .build();
-        g.addParticipant(p);
-        return partRepo.save(p);
+        group.addParticipant(participation);
+        return ParticipationResponseDto.fromEntity(partRepo.save(participation));
     }
 
     @Transactional(readOnly = true)
-    public List<Participation> listByGroup(Long groupId) {
-        return partRepo.findByGroupId(groupId);
+    public List<ParticipationResponseDto> listByGroup(Long groupId) {
+        return partRepo.findByGroupId(groupId)
+                .stream()
+                .map(ParticipationResponseDto::fromEntity)
+                .toList();
     }
 
     public void leave(Long groupId, Long memberId) {
-        Participation p = partRepo.findByGroupId(groupId).stream()
+        Participation participation = partRepo.findByGroupId(groupId).stream()
                 .filter(x -> x.getMemberId().equals(memberId))
                 .findFirst()
                 .orElseThrow(() -> new ExceptionList(ParticipationErrorCode.NOT_FOUND_PARTICIPATION));
-        PurchaseGroup g = p.getGroup();
-        if (g.getHostId().equals(memberId)) {
+
+        PurchaseGroup group = participation.getGroup();
+        if (group.getHostId().equals(memberId)) {
             throw new ExceptionList(ParticipationErrorCode.NOT_LEAVE_HOST);
         }
-        g.removeParticipant(p);
-        partRepo.delete(p);
+
+        group.removeParticipant(participation);
+        partRepo.delete(participation);
     }
 }

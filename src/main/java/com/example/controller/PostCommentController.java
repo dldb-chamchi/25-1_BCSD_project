@@ -3,9 +3,7 @@ package com.example.controller;
 import com.example.controller.swagger.CommentApi;
 import com.example.dto.request.CommentRequestDto;
 import com.example.dto.response.CommentResponseDto;
-import com.example.exception.BadRequestException;
 import com.example.model.Member;
-import com.example.model.PostComment;
 import com.example.service.MemberService;
 import com.example.service.PostCommentService;
 import jakarta.validation.Valid;
@@ -35,15 +33,11 @@ public class PostCommentController implements CommentApi {
             @AuthenticationPrincipal UserDetails user,
             @Valid @RequestBody CommentRequestDto dto
     ) {
-        var member = memberService.getByEmail(user.getUsername());
-        var c = commentService.create(postId, member.getId(), dto);
-
-        if (!c.getPost().getGroup().getId().equals(groupId)) {
-            throw new BadRequestException("잘못된 그룹 경로입니다");
-        }
-        return ResponseEntity.created(
-                        URI.create("/api/groups/" + groupId + "/posts/" + postId + "/comments/" + c.getId()))
-                .body(CommentResponseDto.fromEntity(c));
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        CommentResponseDto response = commentService.create(postId, memberId, dto);
+        return ResponseEntity
+                .created(URI.create("/api/groups/" + groupId + "/posts/" + postId + "/comments/" + response.id()))
+                .body(response);
     }
 
     @GetMapping
@@ -51,11 +45,7 @@ public class PostCommentController implements CommentApi {
             @PathVariable Long groupId,
             @PathVariable Long postId,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        List<CommentResponseDto> dtos = commentService.list(postId, pageable).stream()
-                .filter(c -> c.getPost().getGroup().getId().equals(groupId))
-                .map(CommentResponseDto::fromEntity)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(commentService.list(postId, pageable).getContent());
     }
 
     @PutMapping("/{commentId}")
@@ -66,12 +56,9 @@ public class PostCommentController implements CommentApi {
             @AuthenticationPrincipal UserDetails user,
             @Valid @RequestBody CommentRequestDto dto
     ) {
-        Member m = memberService.getByEmail(user.getUsername());
-        PostComment updated = commentService.update(
-                groupId, postId, commentId,
-                m.getId(), dto
-        );
-        return ResponseEntity.ok(CommentResponseDto.fromEntity(updated));
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        CommentResponseDto updated = commentService.update(groupId, postId, commentId, memberId, dto);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{commentId}")

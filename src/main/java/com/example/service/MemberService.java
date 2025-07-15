@@ -1,14 +1,15 @@
 package com.example.service;
 
 import com.example.dto.request.MemberRequestDto;
+import com.example.dto.response.CommentResponseDto;
+import com.example.dto.response.GroupResponseDto;
+import com.example.dto.response.MemberResponseDto;
+import com.example.dto.response.PostResponseDto;
 import com.example.exception.ExceptionList;
 import com.example.exception.errorCode.MemberErrorCode;
 import com.example.model.Member;
 import com.example.model.Participation;
-import com.example.model.PurchaseGroup;
-import com.example.repository.MemberRepository;
-import com.example.repository.ParticipationRepository;
-import com.example.repository.PurchaseGroupRepository;
+import com.example.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,19 +26,22 @@ public class MemberService {
     private final MemberRepository memberRepo;
     private final ParticipationRepository partRepo;
     private final PurchaseGroupRepository groupRepo;
+    private final GroupPostRepository postRepo;
+    private final PostCommentRepository commentRepo;
     private final PasswordEncoder passwordEncoder;
 
-    public Member register(MemberRequestDto dto) {
+    public MemberResponseDto register(MemberRequestDto dto) {
         memberRepo.findByEmail(dto.email())
                 .ifPresent(m -> { throw new ExceptionList(MemberErrorCode.DUPLICATE_EMAIL); });
-        Member m = dto.toEntity(passwordEncoder);
-        return memberRepo.save(m);
+        Member member = dto.toEntity(passwordEncoder);
+        return MemberResponseDto.fromEntity(memberRepo.save(member));
     }
 
     @Transactional(readOnly = true)
-    public Member get(Long id) {
-        return memberRepo.findByIdAndDeletedFalse(id)
+    public MemberResponseDto get(Long memberId) {
+        Member member = memberRepo.findByIdAndDeletedFalse(memberId)
                 .orElseThrow(() -> new ExceptionList(MemberErrorCode.NOT_FOUND_USER));
+        return MemberResponseDto.fromEntity(member);
     }
 
     @Transactional(readOnly=true)
@@ -48,26 +51,45 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public List<PurchaseGroup> getJoinedGroups(Long memberId) {
+    public List<GroupResponseDto> getJoinedGroups(Long memberId) {
         if(!memberRepo.existsById(memberId)) {
             throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
         }
         List<Participation> parts = partRepo.findByMemberId(memberId);
         return parts.stream()
-                .map(Participation::getGroup)
-                .collect(Collectors.toList());
+                .map(p -> GroupResponseDto.fromEntity(p.getGroup()))
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public Page<PurchaseGroup> getHostGroups(Long memberId, Pageable pageable) {
+    public Page<GroupResponseDto> getHostGroups(Long memberId, Pageable pageable) {
         if (!memberRepo.existsById(memberId)) {
             throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
         }
-        return groupRepo.findByHostId(memberId, pageable);
+        return groupRepo.findByHostId(memberId, pageable)
+                .map(GroupResponseDto::fromEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostResponseDto> getMemberPosts(Long memberId, Pageable pageable) {
+        if (!memberRepo.existsById(memberId)) {
+            throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
+        }
+        return postRepo.findByHostId(memberId, pageable)
+                .map(PostResponseDto::fromEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CommentResponseDto> getMemberComments(Long memberId, Pageable pageable) {
+        if (!memberRepo.existsById(memberId)) {
+            throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
+        }
+        return commentRepo.findByMemberId(memberId, pageable)
+                .map(CommentResponseDto::fromEntity);
     }
 
     public void delete(Long id) {
-        Member m = memberRepo.findById(id)
+        Member m = memberRepo.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ExceptionList(MemberErrorCode.NOT_FOUND_USER));
         List<Participation> parts = partRepo.findByMemberId(id);
         if (!parts.isEmpty()) {

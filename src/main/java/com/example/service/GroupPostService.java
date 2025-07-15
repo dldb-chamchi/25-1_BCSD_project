@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.dto.request.PostRequestDto;
+import com.example.dto.response.PostResponseDto;
 import com.example.exception.ExceptionList;
 import com.example.exception.errorCode.GroupErrorCode;
 import com.example.exception.errorCode.PathErrorCode;
@@ -11,11 +12,10 @@ import com.example.repository.GroupPostRepository;
 import com.example.repository.PostCommentRepository;
 import com.example.repository.PurchaseGroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,54 +25,53 @@ public class GroupPostService {
     private final PurchaseGroupRepository groupRepo;
     private final PostCommentRepository commentRepo;
 
-    public GroupPost create(Long groupId, Long hostId, PostRequestDto dto) {
-        PurchaseGroup g = groupRepo.findById(groupId)
+    public PostResponseDto create(Long groupId, Long hostId, PostRequestDto dto) {
+        PurchaseGroup group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
 
-        if (!g.getHostId().equals(hostId))
+        if (!group.getHostId().equals(hostId))
             throw new ExceptionList(PostErrorCode.HOST_ONLY_POST_UPLOAD);
 
-        GroupPost p = dto.toEntity(g, hostId);
-        return postRepo.save(p);
+        GroupPost post = dto.toEntity(group, hostId);
+        return PostResponseDto.fromEntity(postRepo.save(post));
     }
 
     @Transactional(readOnly = true)
-    public GroupPost getById(Long groupId, Long postId) {
+    public PostResponseDto getById(Long groupId, Long postId) {
         if (!groupRepo.existsById(groupId)) {
             throw new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP);
         }
+
         GroupPost post = postRepo.findById(postId)
                 .orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
 
         if (!post.getGroup().getId().equals(groupId)) {
             throw new ExceptionList(PathErrorCode.NOT_VALID_PATH);
         }
-        return post;
+        return PostResponseDto.fromEntity(post);
     }
 
     @Transactional(readOnly=true)
-    public List<GroupPost> list(Long groupId, Pageable pageable) {
+    public Page<PostResponseDto> list(Long groupId, Pageable pageable) {
         if (!groupRepo.existsById(groupId)) {
             throw new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP);
         }
-        return postRepo.findByGroupId(groupId, pageable);
+        return postRepo.findByGroupId(groupId, pageable)
+                .map(PostResponseDto::fromEntity);
     }
 
-    @Transactional(readOnly=true)
-    public List<GroupPost> listByHost(Long hostId, Pageable pageable) {
-        return postRepo.findByHostId(hostId, pageable);
-    }
+    public PostResponseDto update(Long groupId, Long postId, Long hostId, PostRequestDto dto) {
+        GroupPost post = postRepo.findById(postId).orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
 
-    public GroupPost update(Long groupId, Long postId, Long hostId, PostRequestDto dto) {
-        var post = postRepo.findById(postId).orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
         if (!post.getGroup().getId().equals(groupId)) {
             throw new ExceptionList(PathErrorCode.NOT_VALID_PATH);
         }
         if (!post.getHostId().equals(hostId)) {
             throw new ExceptionList(PostErrorCode.HOST_ONLY_POST_UPDATE);
         }
+
         post.update(dto.title(), dto.content());
-        return post;
+        return PostResponseDto.fromEntity(post);
     }
 
     public void delete(Long groupId, Long postId, Long hostId) {
@@ -85,6 +84,7 @@ public class GroupPostService {
         if (!post.getHostId().equals(hostId)) {
             throw new ExceptionList(PostErrorCode.HOST_ONLY_POST_DELETE);
         }
+
         long commentCount = commentRepo.countByPostId(postId);
         if (commentCount > 0) {
             throw new ExceptionList(PostErrorCode.NOT_DELETE_WITH_COMMENT);

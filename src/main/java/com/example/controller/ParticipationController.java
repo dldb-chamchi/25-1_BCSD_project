@@ -5,6 +5,7 @@ import com.example.dto.response.ParticipationResponseDto;
 import com.example.service.MemberService;
 import com.example.service.ParticipationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,19 +26,16 @@ public class ParticipationController implements ParticipationApi {
             @PathVariable Long groupId,
             @AuthenticationPrincipal UserDetails user
     ) {
-        var m = memberService.getByEmail(user.getUsername());
-        var p = partService.join(groupId, m.getId());
-        return ResponseEntity.created(
-                        URI.create("/api/groups/" + groupId + "/participants/" + p.getId()))
-                .body(ParticipationResponseDto.fromEntity(p));
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        ParticipationResponseDto response = partService.join(groupId, memberId);
+        return ResponseEntity
+                .created(URI.create("/api/groups/" + groupId + "/participants/" + response.id()))
+                .body(response);
     }
 
     @GetMapping
     public ResponseEntity<List<ParticipationResponseDto>> list(@PathVariable Long groupId) {
-        List<ParticipationResponseDto> dtos = partService.listByGroup(groupId).stream()
-                .map(ParticipationResponseDto::fromEntity)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(partService.listByGroup(groupId));
     }
 
     @DeleteMapping

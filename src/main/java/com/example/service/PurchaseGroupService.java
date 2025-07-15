@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.dto.request.GroupRequestDto;
+import com.example.dto.response.GroupResponseDto;
 import com.example.exception.ExceptionList;
 import com.example.exception.errorCode.GroupErrorCode;
 import com.example.model.PurchaseGroup;
@@ -22,7 +23,7 @@ public class PurchaseGroupService {
     private final PurchaseGroupRepository groupRepo;
     private final GroupPostRepository postRepo;
 
-    public PurchaseGroup create(GroupRequestDto dto, Long hostId) {
+    public GroupResponseDto create(GroupRequestDto dto, Long hostId) {
         PurchaseGroup group = dto.toEntity(hostId);
 
         Participation hostParticipation = Participation.builder()
@@ -32,49 +33,61 @@ public class PurchaseGroupService {
                 .build();
         group.addParticipant(hostParticipation);
 
-        return groupRepo.save(group);
+        return GroupResponseDto.fromEntity(groupRepo.save(group));
     }
 
     @Transactional(readOnly = true)
-    public Page<PurchaseGroup> listAll(Pageable pageable) {
-        return groupRepo.findAll(pageable);
+    public Page<GroupResponseDto> listAll(Pageable pageable) {
+        return groupRepo.findAll(pageable)
+                .map(GroupResponseDto::fromEntity);
     }
 
     @Transactional(readOnly = true)
-    public PurchaseGroup get(Long id) {
-        return groupRepo.findById(id)
+    public GroupResponseDto get(Long id) {
+        PurchaseGroup group = groupRepo.findById(id)
                 .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
+        return GroupResponseDto.fromEntity(group);
     }
 
     @Transactional(readOnly = true)
-    public Page<PurchaseGroup> listOpen(Pageable pageable) {
-        return groupRepo.findByStatus("OPEN", pageable);
+    public Page<GroupResponseDto> listOpen(Pageable pageable) {
+        return groupRepo.findByStatus("OPEN", pageable)
+                .map(GroupResponseDto::fromEntity);
     }
 
     @Transactional(readOnly = true)
-    public Page<PurchaseGroup> listAvailable(Pageable pageable) {
-        return groupRepo.findAvailableByStatusAndMaxMembers("OPEN", pageable);
+    public Page<GroupResponseDto> listAvailable(Pageable pageable) {
+        return groupRepo.findAvailableByStatusAndMaxMembers("OPEN", pageable)
+            .map(GroupResponseDto::fromEntity);
     }
 
-    public PurchaseGroup update(Long groupId, Long hostId, GroupRequestDto dto) {
-        PurchaseGroup g = get(groupId);
-        if (!g.getHostId().equals(hostId)) {
+    public GroupResponseDto update(Long groupId, Long hostId, GroupRequestDto dto) {
+        PurchaseGroup group = groupRepo.findById(groupId).
+                orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
+
+        if (!group.getHostId().equals(hostId)) {
             throw new ExceptionList(GroupErrorCode.HOST_ONLY_GROUP_UPDATE);
         }
-        g.update(dto.title(), dto.description(), dto.maxMembers(), dto.expiresAt());
-        return g;
+
+        group.update(dto.title(), dto.description(), dto.maxMembers(), dto.expiresAt());
+        return GroupResponseDto.fromEntity(group);
     }
 
     public void changeStatus(Long groupId, Long hostId, String newStatus) {
-        PurchaseGroup g = get(groupId);
-        if (!g.getHostId().equals(hostId)) {
+        PurchaseGroup group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
+
+        if (!group.getHostId().equals(hostId)) {
             throw new ExceptionList(GroupErrorCode.HOST_ONLY_GROUP_UPDATE);
         }
-        g.updateStatus(newStatus);
+
+        group.updateStatus(newStatus);
     }
 
     public void delete(Long id, Long hostId) {
-        PurchaseGroup g = get(id);
+        PurchaseGroup g = groupRepo.findById(id)
+                .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
+
         if (!g.getHostId().equals(hostId)) {
             throw new ExceptionList(GroupErrorCode.HOST_ONLY_GROUP_DELETE);
         }

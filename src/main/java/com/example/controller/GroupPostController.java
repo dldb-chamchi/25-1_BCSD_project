@@ -3,8 +3,6 @@ package com.example.controller;
 import com.example.controller.swagger.PostApi;
 import com.example.dto.request.PostRequestDto;
 import com.example.dto.response.PostResponseDto;
-import com.example.model.GroupPost;
-import com.example.model.Member;
 import com.example.service.GroupPostService;
 import com.example.service.MemberService;
 import jakarta.validation.Valid;
@@ -33,11 +31,11 @@ public class GroupPostController implements PostApi {
             @AuthenticationPrincipal UserDetails user,
             @Valid @RequestBody PostRequestDto dto
     ) {
-        var m = memberService.getByEmail(user.getUsername());
-        var p = postService.create(groupId, m.getId(), dto);
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        PostResponseDto response = postService.create(groupId, memberId, dto);
         return ResponseEntity
-                .created(URI.create("/api/groups/" + groupId + "/posts/" + p.getId()))
-                .body(PostResponseDto.fromEntity(p));
+                .created(URI.create("/api/groups/" + groupId + "/posts/" + response.id()))
+                .body(response);
     }
 
     @GetMapping("/{postId}")
@@ -45,18 +43,14 @@ public class GroupPostController implements PostApi {
             @PathVariable Long groupId,
             @PathVariable Long postId
     ) {
-        GroupPost p = postService.getById(groupId, postId);
-        return ResponseEntity.ok(PostResponseDto.fromEntity(p));
+        return ResponseEntity.ok(postService.getById(groupId, postId));
     }
 
     @GetMapping
     public ResponseEntity<List<PostResponseDto>> list(@PathVariable Long groupId,
                                                       @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
                                                       Pageable pageable) {
-        List<PostResponseDto> dtos = postService.list(groupId, pageable).stream()
-                .map(PostResponseDto::fromEntity)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok( postService.list(groupId, pageable).getContent());
     }
 
     @PutMapping("/{postId}")
@@ -66,9 +60,9 @@ public class GroupPostController implements PostApi {
             @AuthenticationPrincipal UserDetails user,
             @Valid @RequestBody PostRequestDto dto
     ) {
-        Member host = memberService.getByEmail(user.getUsername());
-        GroupPost updated = postService.update(groupId, postId, host.getId(), dto);
-        return ResponseEntity.ok(PostResponseDto.fromEntity(updated));
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        PostResponseDto updated = postService.update(groupId, postId, memberId, dto);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{postId}")
@@ -77,8 +71,8 @@ public class GroupPostController implements PostApi {
             @PathVariable Long postId,
             @AuthenticationPrincipal UserDetails user
     ) {
-        Member m = memberService.getByEmail(user.getUsername());
-        postService.delete(groupId, postId, m.getId());
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        postService.delete(groupId, postId, memberId);
         return ResponseEntity.noContent().build();
     }
 }

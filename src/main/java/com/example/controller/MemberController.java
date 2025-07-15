@@ -7,10 +7,7 @@ import com.example.dto.response.CommentResponseDto;
 import com.example.dto.response.GroupResponseDto;
 import com.example.dto.response.MemberResponseDto;
 import com.example.dto.response.PostResponseDto;
-import com.example.model.Member;
-import com.example.service.GroupPostService;
 import com.example.service.MemberService;
-import com.example.service.PostCommentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -32,63 +29,47 @@ import java.util.List;
 @Tag(name = "User", description = "사용자 관련 API")
 public class MemberController implements MemberApi {
     private final MemberService memberService;
-    private final GroupPostService postService;
-    private final PostCommentService commentService;
     private final AuthService authService;
 
     @PostMapping
     public ResponseEntity<MemberResponseDto> register(@Valid @RequestBody MemberRequestDto dto) {
-        Member m = memberService.register(dto);
+        MemberResponseDto response = memberService.register(dto);
         return ResponseEntity
-                .created(URI.create("/api/members/" + m.getId()))
-                .body(MemberResponseDto.fromEntity(m));
+                .created(URI.create("/api/members/" + response.id()))
+                .body(response);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<MemberResponseDto> get(@PathVariable Long id) {
-        Member m = memberService.get(id);
-        return ResponseEntity.ok(MemberResponseDto.fromEntity(m));
+    @GetMapping("/{memberId}")
+    public ResponseEntity<MemberResponseDto> get(@PathVariable Long memberId) {
+        return ResponseEntity.ok(memberService.get(memberId));
     }
 
     @GetMapping("/{memberId}/groups")
     public ResponseEntity<List<GroupResponseDto>> getJoinedGroups(@PathVariable Long memberId) {
-        List<GroupResponseDto> dtos = memberService.getJoinedGroups(memberId).stream()
-                .map(GroupResponseDto::fromEntity)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(memberService.getJoinedGroups(memberId));
     }
 
     @GetMapping("/{memberId}/posts")
-    public ResponseEntity<List<PostResponseDto>> getMyPosts(@PathVariable Long memberId,
-                                                            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+    public ResponseEntity<List<PostResponseDto>> getMemberPosts(@PathVariable Long memberId,
+                                                                @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
                                                             Pageable pageable) {
-        memberService.get(memberId);
-        List<PostResponseDto> dtos = postService.listByHost(memberId, pageable).stream()
-                .map(PostResponseDto::fromEntity)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(memberService.getMemberPosts(memberId, pageable).getContent());
     }
 
     @GetMapping("/{memberId}/comments")
-    public ResponseEntity<List<CommentResponseDto>> getMyComments(@PathVariable Long memberId,
-                                                                  @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+    public ResponseEntity<List<CommentResponseDto>> getMemberComments(@PathVariable Long memberId,
+                                                                      @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
                                                                   Pageable pageable) {
-        memberService.get(memberId);
-        List<CommentResponseDto> dtos = commentService.listByMember(memberId, pageable).stream()
-                .map(CommentResponseDto::fromEntity)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(memberService.getMemberComments(memberId, pageable).getContent());
     }
 
     @GetMapping("/me/groups")
     public ResponseEntity<List<GroupResponseDto>> myAllGroups(
             @AuthenticationPrincipal UserDetails user
     ) {
-        Member m = memberService.getByEmail(user.getUsername());
-        List<GroupResponseDto> dtos = memberService.getJoinedGroups(m.getId()).stream()
-                .map(GroupResponseDto::fromEntity)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        List<GroupResponseDto> response = memberService.getJoinedGroups(memberId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/me/groups/host")
@@ -96,11 +77,8 @@ public class MemberController implements MemberApi {
             @AuthenticationPrincipal UserDetails user,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable) {
-        Member m = memberService.getByEmail(user.getUsername());
-        List<GroupResponseDto> dtos = memberService.getHostGroups(m.getId(), pageable).stream()
-                .map(GroupResponseDto::fromEntity)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        return ResponseEntity.ok(memberService.getHostGroups(memberId, pageable).getContent());
     }
 
     @GetMapping("/me/posts")
@@ -109,11 +87,8 @@ public class MemberController implements MemberApi {
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
-        Member m = memberService.getByEmail(user.getUsername());
-        List<PostResponseDto> dtos = postService.listByHost(m.getId(), pageable).stream()
-                .map(PostResponseDto::fromEntity)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        return ResponseEntity.ok(memberService.getMemberPosts(memberId, pageable).getContent());
     }
 
     @GetMapping("/me/comments")
@@ -121,11 +96,8 @@ public class MemberController implements MemberApi {
             @AuthenticationPrincipal UserDetails user,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable) {
-        Member m = memberService.getByEmail(user.getUsername());
-        List<CommentResponseDto> dtos = commentService.listByMember(m.getId(), pageable).stream()
-                .map(CommentResponseDto::fromEntity)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        Long memberId = memberService.getByEmail(user.getUsername()).getId();
+        return ResponseEntity.ok(memberService.getMemberComments(memberId, pageable).getContent());
     }
 
     @DeleteMapping
