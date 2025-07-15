@@ -34,8 +34,8 @@ public class ParticipationController implements ParticipationApi {
     }
 
     @GetMapping
-    public ResponseEntity<List<ParticipationResponseDto>> list(@PathVariable Long groupId) {
-        return ResponseEntity.ok(partService.listByGroup(groupId));
+    public ResponseEntity<List<ParticipationResponseDto>> list(@PathVariable Long groupId, Pageable pageable) {
+        return ResponseEntity.ok(partService.listByGroup(groupId, pageable).getContent());
     }
 
     @DeleteMapping

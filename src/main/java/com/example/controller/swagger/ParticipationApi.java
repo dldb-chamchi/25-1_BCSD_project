@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +29,7 @@ public interface ParticipationApi {
     @ApiResponse(responseCode = "200", description = "참여 기록 조회 성공", content = @Content(mediaType = "application/json"))
     @GetMapping
     ResponseEntity<List<ParticipationResponseDto>> list(
-            @PathVariable Long groupId
+            @PathVariable Long groupId, Pageable pageable
     );
 
     @Operation(summary = "그룹 떠나기", description = "그룹 참여자만 가능합니다")

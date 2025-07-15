@@ -45,8 +45,10 @@ public class MemberController implements MemberApi {
     }
 
     @GetMapping("/{memberId}/groups")
-    public ResponseEntity<List<GroupResponseDto>> getJoinedGroups(@PathVariable Long memberId) {
-        return ResponseEntity.ok(memberService.getJoinedGroups(memberId));
+    public ResponseEntity<List<GroupResponseDto>> getJoinedGroups(@PathVariable Long memberId,
+                                                                  @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+                                                                  Pageable pageable) {
+        return ResponseEntity.ok(memberService.getJoinedGroups(memberId, pageable).getContent());
     }
 
     @GetMapping("/{memberId}/posts")
@@ -65,10 +67,12 @@ public class MemberController implements MemberApi {
 
     @GetMapping("/me/groups")
     public ResponseEntity<List<GroupResponseDto>> myAllGroups(
-            @AuthenticationPrincipal UserDetails user
+            @AuthenticationPrincipal UserDetails user,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
     ) {
         Long memberId = memberService.getByEmail(user.getUsername()).getId();
-        List<GroupResponseDto> response = memberService.getJoinedGroups(memberId);
+        List<GroupResponseDto> response = memberService.getJoinedGroups(memberId, pageable).getContent();
         return ResponseEntity.ok(response);
     }
 

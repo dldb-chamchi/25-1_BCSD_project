@@ -39,7 +39,9 @@ public interface MemberApi {
     @Operation(summary = "가입된 그룹 조회")
     @ApiResponse(responseCode = "200", description = "가입된 그룹 조회 성공", content = @Content(mediaType = "application/json"))
     @GetMapping("/{memberId}/groups")
-    ResponseEntity<List<GroupResponseDto>> getJoinedGroups(@PathVariable Long memberId);
+    ResponseEntity<List<GroupResponseDto>> getJoinedGroups(@PathVariable Long memberId,
+                                                           @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+                                                           Pageable pageable);
 
     @Operation(summary = "멤버가 쓴 게시글 조회")
     @ApiResponse(responseCode = "200", description = "게시글 조회 성공", content = @Content(mediaType = "application/json"))
@@ -59,7 +61,9 @@ public interface MemberApi {
     @ApiResponse(responseCode = "200", description = "그룹 모두 조회 성공", content = @Content(mediaType = "application/json"))
     @GetMapping("/me/groups")
     ResponseEntity<List<GroupResponseDto>> myAllGroups(
-            @AuthenticationPrincipal UserDetails user
+            @AuthenticationPrincipal UserDetails user,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable
     );
 
     @Operation(summary = "본인이 호스트인 그룹 모두 조회")

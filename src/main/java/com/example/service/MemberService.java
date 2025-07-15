@@ -51,14 +51,12 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public List<GroupResponseDto> getJoinedGroups(Long memberId) {
+    public Page<GroupResponseDto> getJoinedGroups(Long memberId, Pageable pageable) {
         if(!memberRepo.existsById(memberId)) {
             throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
         }
-        List<Participation> parts = partRepo.findByMemberId(memberId);
-        return parts.stream()
-                .map(p -> GroupResponseDto.fromEntity(p.getGroup()))
-                .toList();
+        return groupRepo.findByHostId(memberId, pageable)
+                .map(GroupResponseDto::fromEntity);
     }
 
     @Transactional(readOnly = true)

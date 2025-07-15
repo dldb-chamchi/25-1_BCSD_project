@@ -10,11 +10,12 @@ import com.example.model.PurchaseGroupStatus;
 import com.example.repository.ParticipationRepository;
 import com.example.repository.PurchaseGroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,11 +48,9 @@ public class ParticipationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ParticipationResponseDto> listByGroup(Long groupId) {
-        return partRepo.findByGroupId(groupId)
-                .stream()
-                .map(ParticipationResponseDto::fromEntity)
-                .toList();
+    public Page<ParticipationResponseDto> listByGroup(Long groupId, Pageable pageable) {
+        return partRepo.findByGroupId(groupId, pageable)
+                .map(ParticipationResponseDto::fromEntity);
     }
 
     public void leave(Long groupId, Long memberId) {
