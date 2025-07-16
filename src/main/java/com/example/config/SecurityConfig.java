@@ -51,14 +51,7 @@ public class SecurityConfig {
                                         "/webjars/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .logout(logout -> logout
-                        .logoutUrl("/auth/logout")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .logoutSuccessHandler((req, res, auth) ->
-                                res.setStatus(HttpStatus.OK.value())
-                        )
-                )
+                .logout(AbstractHttpConfigurer::disable)
         ;
         return http.build();
     }
