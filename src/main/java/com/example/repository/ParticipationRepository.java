@@ -13,5 +13,6 @@ public interface ParticipationRepository extends JpaRepository<Participation, Lo
     List<Participation> findByGroupId(Long groupId);
     Page<Participation> findByGroupId(Long groupId, Pageable pageable);
     List<Participation> findByMemberId(Long memberId);
+    Page<Participation> findByMemberId(Long memberId, Pageable pageable);
     boolean existsByGroupIdAndMemberId(Long groupId, Long memberId);
 }
