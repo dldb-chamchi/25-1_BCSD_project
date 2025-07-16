@@ -16,12 +16,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionResponse> handleOther(Exception ignoredEx) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ExceptionResponse("SERVER_ERROR", "서버 에러"));
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleValidation(MethodArgumentNotValidException ex) {
         String msg = ex.getBindingResult().getFieldErrors().stream()
@@ -66,5 +60,11 @@ public class GlobalExceptionHandler {
         ErrorCode ec = e.getErrorCode();
         ExceptionResponse body = new ExceptionResponse(ec.name(), ec.getMessage());
         return new ResponseEntity<>(body, ec.getHttpStatus());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionResponse> handleOther(Exception ignoredEx) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ExceptionResponse("SERVER_ERROR", "서버 에러"));
     }
 }
