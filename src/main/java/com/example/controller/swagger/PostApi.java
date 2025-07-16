@@ -2,9 +2,12 @@ package com.example.controller.swagger;
 
 import com.example.dto.request.PostRequestDto;
 import com.example.dto.response.PostResponseDto;
+import com.example.exception.ExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +25,7 @@ import java.util.List;
 public interface PostApi {
 
     @Operation(summary = "그룹 게시글 생성", description = "호스트만 가능합니다")
-    @ApiResponse(responseCode = "200", description = "그룹 게시글 생성 성공", content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "201", description = "그룹 게시글 생성 성공", content = @Content(mediaType = "application/json"))
     @PostMapping
     ResponseEntity<PostResponseDto> create(
             @PathVariable Long groupId,
@@ -57,8 +60,11 @@ public interface PostApi {
             @Valid @RequestBody PostRequestDto dto
     );
 
-    @Operation(summary = "그룹 게시글 삭제", description = "호스트만 가능합니다")
-    @ApiResponse(responseCode = "200", description = "그룹 게시글 삭제 성공", content = @Content(mediaType = "application/json"))
+    @Operation(summary = "그룹 게시글 삭제", description = "호스트만 가능합니다/댓글이 있을 경우 불가능합니다")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "그룹 게시글 삭제 성공", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "호스트만 가능합니다/댓글이 있을 경우 불가능합니다", content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
+    })
     @DeleteMapping("/{postId}")
     ResponseEntity<Void> delete(
             @PathVariable Long groupId,

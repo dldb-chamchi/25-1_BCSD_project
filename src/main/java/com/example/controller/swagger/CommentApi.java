@@ -2,9 +2,12 @@ package com.example.controller.swagger;
 
 import com.example.dto.request.CommentRequestDto;
 import com.example.dto.response.CommentResponseDto;
+import com.example.exception.ExceptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +26,12 @@ import java.util.List;
 public interface CommentApi {
 
     @Operation(summary = "댓글 생성", description = "그룹 참여자만 가능합니다")
-    @ApiResponse(responseCode = "200", description = "댓글 생성 성공", content = @Content(mediaType = "application/json"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "댓글 생성 성공", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "참여자만 가능합니다/잘못된 경로입니다", content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
+            @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없습니다", content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
+    })
+
     @PostMapping
     ResponseEntity<CommentResponseDto> create(
             @PathVariable Long groupId,
@@ -43,7 +51,11 @@ public interface CommentApi {
     );
 
     @Operation(summary = "댓글 변경", description = "작성자만 가능합니다")
-    @ApiResponse(responseCode = "200", description = "댓글 변경 성공", content = @Content(mediaType = "application/json"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "댓글 변경 성공", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "작성자만 가능합니다/잘못된 경로입니다", content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
+            @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없습니다", content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
+    })
     @PutMapping("/{commentId}")
     ResponseEntity<CommentResponseDto> update(
             @PathVariable Long groupId,
@@ -54,7 +66,11 @@ public interface CommentApi {
     );
 
     @Operation(summary = "댓글 삭제", description = "작성자만 가능합니다")
-    @ApiResponse(responseCode = "200", description = "댓글 삭제 성공", content = @Content(mediaType = "application/json"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "댓글 삭제 성공", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "작성자만 가능합니다/잘못된 경로입니다", content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
+            @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없습니다", content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
+    })
     @DeleteMapping("/{commentId}")
     ResponseEntity<Void> delete(
             @PathVariable Long groupId,
