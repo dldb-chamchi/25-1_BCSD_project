@@ -55,8 +55,10 @@ public class MemberService {
         if(!memberRepo.existsById(memberId)) {
             throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
         }
-        return groupRepo.findByHostId(memberId, pageable)
-                .map(GroupResponseDto::fromEntity);
+        return partRepo.findByMemberId(memberId, pageable)
+                .map(participation ->
+                        GroupResponseDto.fromEntity(participation.getGroup())
+                );
     }
 
     @Transactional(readOnly = true)

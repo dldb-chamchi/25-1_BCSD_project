@@ -46,7 +46,7 @@ public class MemberController implements MemberApi {
 
     @GetMapping("/{memberId}/groups")
     public ResponseEntity<List<GroupResponseDto>> getJoinedGroups(@PathVariable Long memberId,
-                                                                  @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+                                                                  @PageableDefault(sort = "joinedAt", direction = Sort.Direction.DESC)
                                                                   Pageable pageable) {
         return ResponseEntity.ok(memberService.getJoinedGroups(memberId, pageable).getContent());
     }
@@ -68,7 +68,7 @@ public class MemberController implements MemberApi {
     @GetMapping("/me/groups")
     public ResponseEntity<List<GroupResponseDto>> myAllGroups(
             @AuthenticationPrincipal UserDetails user,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            @PageableDefault(sort = "joinedAt", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
         Long memberId = memberService.getByEmail(user.getUsername()).getId();
@@ -105,8 +105,10 @@ public class MemberController implements MemberApi {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> delete(HttpServletRequest request) {
-        Long memberId = (Long) request.getSession().getAttribute("memberId");
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal UserDetails user,
+                                       HttpServletRequest request) {
+
+        Long memberId  = memberService.getByEmail(user.getUsername()).getId();
         memberService.delete(memberId);
         authService.logout(request);
         return ResponseEntity.noContent().build();

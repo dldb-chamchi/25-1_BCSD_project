@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthenticationManager authManager;
+    private final AuthService authService;
 
     @Operation(summary = "로그인")
     @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(mediaType = "application/json"))
@@ -39,6 +40,14 @@ public class AuthController {
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext());
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "로그아웃")
+    @ApiResponse(responseCode = "200", description = "로그아웃 성공")
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        authService.logout(request);
         return ResponseEntity.ok().build();
     }
 }
