@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GroupPostRepository extends JpaRepository<GroupPost, Long> {
     Page<GroupPost> findByGroupId(Long groupId, Pageable pageable);
-    Page<GroupPost> findByHostId(Long HostId, Pageable pageable);
+    Page<GroupPost> findByHostId(Long hostId, Pageable pageable);
     boolean existsByGroupId(Long groupId);
 }

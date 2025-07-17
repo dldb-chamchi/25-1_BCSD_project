@@ -84,7 +84,7 @@ public interface GroupApi {
 
     @Operation(summary = "그룹 상태 변경(오픈, 마감)", description = "호스트만 가능합니다")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "그룹 상태 변경 성공", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "204", description = "그룹 상태 변경 성공", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "404", description = "그룹을 찾을 수 없습니다", content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
             @ApiResponse(responseCode = "400", description = "호스트만 가능합니다", content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
     })
