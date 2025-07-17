@@ -6,6 +6,8 @@ import com.example.service.MemberService;
 import com.example.service.ParticipationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,7 +36,9 @@ public class ParticipationController implements ParticipationApi {
     }
 
     @GetMapping
-    public ResponseEntity<List<ParticipationResponseDto>> list(@PathVariable Long groupId, Pageable pageable) {
+    public ResponseEntity<List<ParticipationResponseDto>> list(@PathVariable Long groupId,
+                                                               @PageableDefault(sort = "joinedAt", direction = Sort.Direction.DESC)
+                                                               Pageable pageable) {
         return ResponseEntity.ok(partService.listByGroup(groupId, pageable).getContent());
     }
 
