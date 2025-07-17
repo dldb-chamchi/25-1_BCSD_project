@@ -20,11 +20,12 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class PurchaseGroupService {
     private final PurchaseGroupRepository groupRepo;
     private final GroupPostRepository postRepo;
 
+    @Transactional
     public GroupResponseDto create(GroupRequestDto dto, Long hostId) {
         PurchaseGroup group = dto.toEntity(hostId);
 
@@ -38,31 +39,28 @@ public class PurchaseGroupService {
         return GroupResponseDto.fromEntity(groupRepo.save(group));
     }
 
-    @Transactional(readOnly = true)
     public Page<GroupResponseDto> listAll(Pageable pageable) {
         return groupRepo.findAll(pageable)
                 .map(GroupResponseDto::fromEntity);
     }
 
-    @Transactional(readOnly = true)
     public GroupResponseDto get(Long id) {
         PurchaseGroup group = groupRepo.findById(id)
                 .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
         return GroupResponseDto.fromEntity(group);
     }
 
-    @Transactional(readOnly = true)
     public Page<GroupResponseDto> listOpen(Pageable pageable) {
         return groupRepo.findByStatus(PurchaseGroupStatus.OPEN, pageable)
                 .map(GroupResponseDto::fromEntity);
     }
 
-    @Transactional(readOnly = true)
     public Page<GroupResponseDto> listAvailable(Pageable pageable) {
         return groupRepo.findAvailableByStatusAndMaxMembers(PurchaseGroupStatus.OPEN, pageable)
                 .map(GroupResponseDto::fromEntity);
     }
 
+    @Transactional
     public GroupResponseDto update(Long groupId, Long hostId, GroupRequestDto dto) {
         PurchaseGroup group = groupRepo.findById(groupId).
                 orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
@@ -75,6 +73,7 @@ public class PurchaseGroupService {
         return GroupResponseDto.fromEntity(group);
     }
 
+    @Transactional
     public void changeStatus(Long groupId, Long hostId, UpdateStatusDto dto) {
         PurchaseGroup group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
@@ -92,6 +91,7 @@ public class PurchaseGroupService {
         group.updateStatus(newStatus);
     }
 
+    @Transactional
     public void delete(Long id, Long hostId) {
         PurchaseGroup g = groupRepo.findById(id)
                 .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));

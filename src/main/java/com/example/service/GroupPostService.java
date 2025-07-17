@@ -19,12 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class GroupPostService {
     private final GroupPostRepository postRepo;
     private final PurchaseGroupRepository groupRepo;
     private final PostCommentRepository commentRepo;
 
+    @Transactional
     public PostResponseDto create(Long groupId, Long hostId, PostRequestDto dto) {
         PurchaseGroup group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
@@ -36,7 +37,6 @@ public class GroupPostService {
         return PostResponseDto.fromEntity(postRepo.save(post));
     }
 
-    @Transactional(readOnly = true)
     public PostResponseDto getById(Long groupId, Long postId) {
         if (!groupRepo.existsById(groupId)) {
             throw new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP);
@@ -51,7 +51,6 @@ public class GroupPostService {
         return PostResponseDto.fromEntity(post);
     }
 
-    @Transactional(readOnly=true)
     public Page<PostResponseDto> list(Long groupId, Pageable pageable) {
         if (!groupRepo.existsById(groupId)) {
             throw new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP);
@@ -60,6 +59,7 @@ public class GroupPostService {
                 .map(PostResponseDto::fromEntity);
     }
 
+    @Transactional
     public PostResponseDto update(Long groupId, Long postId, Long hostId, PostRequestDto dto) {
         GroupPost post = postRepo.findById(postId).orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
 
@@ -74,6 +74,7 @@ public class GroupPostService {
         return PostResponseDto.fromEntity(post);
     }
 
+    @Transactional
     public void delete(Long groupId, Long postId, Long hostId) {
         GroupPost post = postRepo.findById(postId)
                 .orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));

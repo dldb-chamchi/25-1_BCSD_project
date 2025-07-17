@@ -19,11 +19,12 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ParticipationService {
     private final ParticipationRepository partRepo;
     private final PurchaseGroupRepository groupRepo;
 
+    @Transactional
     public ParticipationResponseDto join(Long groupId, Long memberId) {
         PurchaseGroup group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new ExceptionList(GroupErrorCode.NOT_FOUND_GROUP));
@@ -47,12 +48,12 @@ public class ParticipationService {
         return ParticipationResponseDto.fromEntity(partRepo.save(participation));
     }
 
-    @Transactional(readOnly = true)
     public Page<ParticipationResponseDto> listByGroup(Long groupId, Pageable pageable) {
         return partRepo.findByGroupId(groupId, pageable)
                 .map(ParticipationResponseDto::fromEntity);
     }
 
+    @Transactional
     public void leave(Long groupId, Long memberId) {
         Participation participation = partRepo.findByGroupId(groupId).stream()
                 .filter(x -> x.getMemberId().equals(memberId))

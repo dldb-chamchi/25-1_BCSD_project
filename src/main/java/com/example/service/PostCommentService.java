@@ -19,12 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class PostCommentService {
     private final PostCommentRepository commentRepo;
     private final GroupPostRepository postRepo;
     private final ParticipationRepository partRepo;
 
+    @Transactional
     public CommentResponseDto create(Long postId, Long memberId, CommentRequestDto dto) {
         GroupPost post = postRepo.findById(postId)
                 .orElseThrow(() -> new ExceptionList(PostErrorCode.NOT_FOUND_POST));
@@ -38,12 +39,12 @@ public class PostCommentService {
         return CommentResponseDto.fromEntity(commentRepo.save(comment));
     }
 
-    @Transactional(readOnly=true)
     public Page<CommentResponseDto> list(Long postId, Pageable pageable) {
         return commentRepo.findByPostId(postId, pageable)
                 .map(CommentResponseDto::fromEntity);
     }
 
+    @Transactional
     public CommentResponseDto update(
             Long groupId,
             Long postId,
@@ -65,6 +66,8 @@ public class PostCommentService {
         comment.update(dto.content());
         return CommentResponseDto.fromEntity(comment);
     }
+
+    @Transactional
     public void delete(Long groupId, Long postId, Long commentId, Long memberId) {
         PostComment comment = commentRepo.findById(commentId)
                 .orElseThrow(() -> new ExceptionList(CommentErrorCode.NOT_FOUND_COMMENT));

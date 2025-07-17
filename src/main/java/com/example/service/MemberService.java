@@ -21,7 +21,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class MemberService {
     private final MemberRepository memberRepo;
     private final ParticipationRepository partRepo;
@@ -30,6 +30,7 @@ public class MemberService {
     private final PostCommentRepository commentRepo;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public MemberResponseDto register(MemberRequestDto dto) {
         memberRepo.findByEmail(dto.email())
                 .ifPresent(m -> { throw new ExceptionList(MemberErrorCode.DUPLICATE_EMAIL); });
@@ -37,20 +38,17 @@ public class MemberService {
         return MemberResponseDto.fromEntity(memberRepo.save(member));
     }
 
-    @Transactional(readOnly = true)
     public MemberResponseDto get(Long memberId) {
         Member member = memberRepo.findByIdAndDeletedFalse(memberId)
                 .orElseThrow(() -> new ExceptionList(MemberErrorCode.NOT_FOUND_USER));
         return MemberResponseDto.fromEntity(member);
     }
 
-    @Transactional(readOnly=true)
     public Member getByEmail(String email) {
         return memberRepo.findByEmailAndDeletedFalse(email)
                 .orElseThrow(() -> new ExceptionList(MemberErrorCode.NOT_FOUND_USER));
     }
 
-    @Transactional(readOnly = true)
     public Page<GroupResponseDto> getJoinedGroups(Long memberId, Pageable pageable) {
         if(!memberRepo.existsById(memberId)) {
             throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
@@ -61,7 +59,6 @@ public class MemberService {
                 );
     }
 
-    @Transactional(readOnly = true)
     public Page<GroupResponseDto> getHostGroups(Long memberId, Pageable pageable) {
         if (!memberRepo.existsById(memberId)) {
             throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
@@ -70,7 +67,6 @@ public class MemberService {
                 .map(GroupResponseDto::fromEntity);
     }
 
-    @Transactional(readOnly = true)
     public Page<PostResponseDto> getMemberPosts(Long memberId, Pageable pageable) {
         if (!memberRepo.existsById(memberId)) {
             throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
@@ -79,7 +75,6 @@ public class MemberService {
                 .map(PostResponseDto::fromEntity);
     }
 
-    @Transactional(readOnly = true)
     public Page<CommentResponseDto> getMemberComments(Long memberId, Pageable pageable) {
         if (!memberRepo.existsById(memberId)) {
             throw new ExceptionList(MemberErrorCode.NOT_FOUND_USER);
@@ -88,6 +83,7 @@ public class MemberService {
                 .map(CommentResponseDto::fromEntity);
     }
 
+    @Transactional
     public void delete(Long id) {
         Member m = memberRepo.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ExceptionList(MemberErrorCode.NOT_FOUND_USER));
