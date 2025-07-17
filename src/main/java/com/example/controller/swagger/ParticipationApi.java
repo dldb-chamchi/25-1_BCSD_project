@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,7 +36,8 @@ public interface ParticipationApi {
     })
     @GetMapping
     ResponseEntity<List<ParticipationResponseDto>> list(
-            @PathVariable Long groupId, Pageable pageable
+            @PathVariable Long groupId,
+            @ParameterObject Pageable pageable
     );
 
     @Operation(summary = "그룹 떠나기", description = "그룹 참여자만 가능합니다")

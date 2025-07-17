@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -38,7 +39,7 @@ public interface GroupApi {
     @GetMapping
     ResponseEntity<List<GroupResponseDto>> list(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable
+            @ParameterObject Pageable pageable
     );
 
     @Operation(summary = "그룹 조회")
@@ -56,7 +57,7 @@ public interface GroupApi {
     @GetMapping("/open")
     ResponseEntity<List<GroupResponseDto>> listOpen(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable
+            @ParameterObject Pageable pageable
     );
 
     @Operation(summary = "상태가 오픈이고 참여인원이 남은 그룹만 조회")
@@ -64,7 +65,7 @@ public interface GroupApi {
     @ApiResponse(responseCode = "200", description = "가입 가능 그룹 조회 성공", content = @Content(mediaType = "application/json"))
     ResponseEntity<List<GroupResponseDto>> listAvailable(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable
+            @ParameterObject Pageable pageable
     );
 
     @Operation(summary = "그룹 내용 변경", description = "호스트만 가능합니다")

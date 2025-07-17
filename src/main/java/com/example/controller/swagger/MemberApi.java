@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -50,7 +51,7 @@ public interface MemberApi {
     @GetMapping("/{memberId}/groups")
     ResponseEntity<List<GroupResponseDto>> getJoinedGroups(@PathVariable Long memberId,
                                                            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-                                                           Pageable pageable);
+                                                           @ParameterObject Pageable pageable);
 
     @Operation(summary = "멤버가 쓴 게시글 조회")
     @ApiResponses({
@@ -60,7 +61,7 @@ public interface MemberApi {
     @GetMapping("/{memberId}/posts")
     ResponseEntity<List<PostResponseDto>> getMemberPosts(@PathVariable Long memberId,
                                                      @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-                                                            Pageable pageable);
+                                                     @ParameterObject Pageable pageable);
 
     @Operation(summary = "멤버가 쓴 댓글 조회")
     @ApiResponses({
@@ -70,7 +71,7 @@ public interface MemberApi {
     @GetMapping("/{memberId}/comments")
     ResponseEntity<List<CommentResponseDto>> getMemberComments(@PathVariable Long memberId,
                                                                   @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-                                                                  Pageable pageable);
+                                                                  @ParameterObject Pageable pageable);
 
     @Operation(summary = "본인이 가입한 그룹 모두 조회")
     @ApiResponse(responseCode = "200", description = "그룹 모두 조회 성공", content = @Content(mediaType = "application/json"))
@@ -78,7 +79,7 @@ public interface MemberApi {
     ResponseEntity<List<GroupResponseDto>> myAllGroups(
             @AuthenticationPrincipal UserDetails user,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable
+            @ParameterObject Pageable pageable
     );
 
     @Operation(summary = "본인이 호스트인 그룹 모두 조회")
@@ -87,7 +88,7 @@ public interface MemberApi {
     ResponseEntity<List<GroupResponseDto>> myHostGroups(
             @AuthenticationPrincipal UserDetails user,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable);
+            @ParameterObject Pageable pageable);
 
     @Operation(summary = "본인이 쓴 게시글 조회")
     @ApiResponse(responseCode = "200", description = "게시글 조회 성공", content = @Content(mediaType = "application/json"))
@@ -95,7 +96,7 @@ public interface MemberApi {
     ResponseEntity<List<PostResponseDto>> myPosts(
             @AuthenticationPrincipal UserDetails user,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable
+            @ParameterObject Pageable pageable
     );
 
     @Operation(summary = "본인이 쓴 댓글 조회")
@@ -104,7 +105,7 @@ public interface MemberApi {
     ResponseEntity<List<CommentResponseDto>> myComments(
             @AuthenticationPrincipal UserDetails user,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable);
+            @ParameterObject Pageable pageable);
 
     @Operation(summary = "멤버 탈퇴")
     @ApiResponse(responseCode = "204", description = "멤버 탈퇴 성공", content = @Content(mediaType = "application/json"))

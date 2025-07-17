@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -47,7 +48,7 @@ public interface PostApi {
     ResponseEntity<List<PostResponseDto>> list(
             @PathVariable Long groupId,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable
+            @ParameterObject Pageable pageable
     );
 
     @Operation(summary = "그룹 게시글 변경", description = "호스트만 가능합니다")
