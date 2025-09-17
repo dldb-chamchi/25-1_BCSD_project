@@ -1,14 +1,15 @@
 package com.example.service;
 
-import com.example.dto.response.ParticipationResponseDto;
-import com.example.exception.ExceptionList;
-import com.example.exception.errorCode.GroupErrorCode;
-import com.example.exception.errorCode.ParticipationErrorCode;
-import com.example.model.Participation;
-import com.example.model.PurchaseGroup;
-import com.example.model.PurchaseGroupStatus;
-import com.example.repository.ParticipationRepository;
-import com.example.repository.PurchaseGroupRepository;
+import com.example.domain.participation.dto.ParticipationResponseDto;
+import com.example.domain.participation.service.ParticipationService;
+import com.example.global.exception.ExceptionList;
+import com.example.global.exception.errorCode.GroupErrorCode;
+import com.example.global.exception.errorCode.ParticipationErrorCode;
+import com.example.domain.participation.model.Participation;
+import com.example.domain.group.model.Group;
+import com.example.domain.group.model.GroupStatus;
+import com.example.domain.participation.repository.ParticipationRepository;
+import com.example.domain.group.repository.GroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,24 +33,24 @@ class ParticipationServiceTest {
     @Mock
     private ParticipationRepository partRepo;
     @Mock
-    private PurchaseGroupRepository groupRepo;
+    private GroupRepository groupRepo;
     @InjectMocks
     private ParticipationService participationService;
 
     private Long groupId;
     private Long hostId;
     private Long memberId;
-    private PurchaseGroup group;
+    private Group group;
 
     @BeforeEach
     void setUp() {
         groupId = 100L;
         hostId = 200L;
         memberId = 300L;
-        group = PurchaseGroup.builder()
+        group = Group.builder()
                 .id(groupId)
                 .hostId(hostId)
-                .status(PurchaseGroupStatus.OPEN)
+                .status(GroupStatus.OPEN)
                 .maxMembers(2)
                 .participants(new java.util.ArrayList<>())
                 .build();
@@ -91,7 +92,7 @@ class ParticipationServiceTest {
     @Test
     @DisplayName("join: 실패 - 그룹 마감 시 NOT_PARTICIPATE_GROUP_CLOSED")
     void joinClosedGroup() {
-        group.updateStatus(PurchaseGroupStatus.CLOSED);
+        group.updateStatus(GroupStatus.CLOSED);
         when(groupRepo.findById(groupId)).thenReturn(Optional.of(group));
 
         assertThatThrownBy(() -> participationService.join(groupId, memberId))

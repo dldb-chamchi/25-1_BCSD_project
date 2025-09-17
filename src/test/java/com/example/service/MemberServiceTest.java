@@ -1,12 +1,13 @@
 package com.example.service;
 
-import com.example.dto.request.MemberRequestDto;
-import com.example.dto.response.MemberResponseDto;
-import com.example.exception.ExceptionList;
-import com.example.exception.errorCode.MemberErrorCode;
-import com.example.model.Member;
-import com.example.repository.MemberRepository;
-import com.example.repository.ParticipationRepository;
+import com.example.domain.member.dto.MemberRequestDto;
+import com.example.domain.member.dto.MemberResponseDto;
+import com.example.domain.member.service.MemberService;
+import com.example.global.exception.ExceptionList;
+import com.example.global.exception.errorCode.MemberErrorCode;
+import com.example.domain.member.model.Member;
+import com.example.domain.member.repository.MemberRepository;
+import com.example.domain.participation.repository.ParticipationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

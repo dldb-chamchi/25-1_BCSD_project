@@ -1,0 +1,14 @@
+package com.example.global.exception;
+
+import com.example.global.exception.errorCode.ErrorCode;
+import lombok.Getter;
+
+@Getter
+public class ExceptionList extends RuntimeException {
+    private final ErrorCode errorCode;
+
+    public ExceptionList(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
+    }
+}
