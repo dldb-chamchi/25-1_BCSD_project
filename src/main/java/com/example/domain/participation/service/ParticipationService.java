@@ -32,7 +32,7 @@ public class ParticipationService {
         if (group.getStatus() == GroupStatus.CLOSED) {
             throw new ExceptionList(ParticipationErrorCode.NOT_PARTICIPATE_GROUP_CLOSED);
         }
-        if (group.getParticipants().size() >= group.getMaxMembers()) {
+        if (group.getParticipants().size() >= group.getMaxMember()) {
             throw new ExceptionList(ParticipationErrorCode.LIMIT_MAX_MEMBER);
         }
         if (partRepo.existsByGroupIdAndMemberId(groupId, memberId)) {

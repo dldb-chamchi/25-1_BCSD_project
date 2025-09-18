@@ -69,7 +69,7 @@ public class GroupService {
             throw new ExceptionList(GroupErrorCode.HOST_ONLY_GROUP_UPDATE);
         }
 
-        group.update(dto.title(), dto.description(), dto.maxMembers(), dto.expiresAt());
+        group.update(dto.title(), dto.description(), dto.maxMember(), dto.expiresAt());
         return GroupResponseDto.fromEntity(group);
     }
 

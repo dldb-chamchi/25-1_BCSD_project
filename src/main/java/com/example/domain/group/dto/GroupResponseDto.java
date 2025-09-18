@@ -10,7 +10,7 @@ public record GroupResponseDto(
         String title,
         String description,
         LocalDateTime expiresAt,
-        Integer maxMembers,
+        Integer maxMember,
         GroupStatus status,
         Integer participantCount
 ) {
@@ -20,7 +20,7 @@ public record GroupResponseDto(
                 g.getTitle(),
                 g.getDescription(),
                 g.getExpiresAt(),
-                g.getMaxMembers(),
+                g.getMaxMember(),
                 g.getStatus(),
                 g.getParticipants().size()
         );

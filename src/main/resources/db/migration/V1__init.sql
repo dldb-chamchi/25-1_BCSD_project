@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `member` (
                                         password   VARCHAR(100) NOT NULL,
                                         name       VARCHAR(50)  NOT NULL,
                                         created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                        deleted    TINYINT      NOT NULL DEFAULT 0
+                                        deleted    BOOLEAN      NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 2) 공동구매 그룹 (예약어이므로 항상 백틱)

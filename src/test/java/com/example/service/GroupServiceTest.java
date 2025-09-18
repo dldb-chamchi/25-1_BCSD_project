@@ -65,7 +65,7 @@ class GroupServiceTest {
                 .title(dto.title())
                 .description(dto.description())
                 .expiresAt(dto.expiresAt())
-                .maxMembers(dto.maxMembers())
+                .maxMembers(dto.maxMember())
                 .createdAt(unsaved.getCreatedAt())
                 .status(OPEN)
                 .participants(Collections.singletonList(
@@ -85,7 +85,7 @@ class GroupServiceTest {
         assertThat(result.title()).isEqualTo(dto.title());
         assertThat(result.description()).isEqualTo(dto.description());
         assertThat(result.expiresAt()).isEqualTo(dto.expiresAt());
-        assertThat(result.maxMembers()).isEqualTo(dto.maxMembers());
+        assertThat(result.maxMember()).isEqualTo(dto.maxMember());
         assertThat(result.status()).isEqualTo(OPEN);
         assertThat(result.participantCount()).isEqualTo(1);
         verify(groupRepo).save(any(Group.class));

@@ -21,7 +21,7 @@ public record GroupRequestDto(
         @NotNull(message = "그룹 인원은 필수입니다")
         @Min(value = 2,   message = "그룹 인원은 최소 2명이상이어야 합니다")
         @Max(value = 100, message = "그룹 인원은 최대 100명이하이어야 합니다")
-        Integer maxMembers
+        Integer maxMember
 ) {
     public Group toEntity(Long hostId) {
         return Group.builder()
@@ -29,7 +29,7 @@ public record GroupRequestDto(
                 .title(title)
                 .description(description)
                 .expiresAt(expiresAt)
-                .maxMembers(maxMembers)
+                .maxMember(maxMember)
                 .createdAt(LocalDateTime.now())
                 .status(GroupStatus.OPEN)
                 .build();

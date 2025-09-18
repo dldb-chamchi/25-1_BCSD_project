@@ -38,8 +38,8 @@ public class Group {
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
-    @Column(name = "max_members", nullable = false)
-    private Integer maxMembers;
+    @Column(name = "max_member", nullable = false)
+    private Integer maxMember;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -56,10 +56,10 @@ public class Group {
     @Builder.Default
     private List<Participation> participants = new ArrayList<>();
 
-    public void update(String newTitle, String newDescription, Integer newMaxMembers, LocalDateTime newExpiresAt) {
+    public void update(String newTitle, String newDescription, Integer newMaxMember, LocalDateTime newExpiresAt) {
             this.title = newTitle;
             this.description = newDescription;
-            this.maxMembers = newMaxMembers;
+            this.maxMember = newMaxMember;
             this.expiresAt = newExpiresAt;
     }
 

@@ -19,7 +19,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     //status 가 OPEN, 참가자 수 < maxMembers 인 그룹
     @Query("SELECT g FROM Group g " +
             "WHERE g.status = :status " +
-            "  AND SIZE(g.participants) < g.maxMembers")
+            "  AND SIZE(g.participants) < g.maxMember")
     Page<Group> findAvailableByStatusAndMaxMembers(@Param("status") GroupStatus status, Pageable pageable);
     Page<Group> findByHostId(Long memberId, Pageable pageable);
 }
