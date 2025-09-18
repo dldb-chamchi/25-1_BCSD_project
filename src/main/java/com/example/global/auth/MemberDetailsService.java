@@ -1,4 +1,4 @@
-package com.example.global;
+package com.example.global.auth;
 
 import com.example.domain.member.model.Member;
 import com.example.domain.member.repository.MemberRepository;

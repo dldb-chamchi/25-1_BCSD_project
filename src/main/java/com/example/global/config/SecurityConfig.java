@@ -1,6 +1,6 @@
 package com.example.global.config;
 
-import com.example.global.MemberDetailsService;
+import com.example.global.auth.MemberDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpStatus;

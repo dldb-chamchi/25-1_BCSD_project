@@ -1,4 +1,4 @@
-package com.example.global;
+package com.example.global.auth;
 
 import jakarta.validation.constraints.NotBlank;
 
