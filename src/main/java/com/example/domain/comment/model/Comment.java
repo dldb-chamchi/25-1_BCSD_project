@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import com.example.domain.post.model.Post;
 
 @Entity
-@Table(name = "post_comment")
+@Table(name = "comment")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -30,6 +30,9 @@ public class Comment {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @CreationTimestamp
+    private LocalDateTime updatedAt;
 
     public void update(String newContent) {
         this.content = newContent;

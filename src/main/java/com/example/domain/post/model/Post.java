@@ -12,7 +12,7 @@ import com.example.domain.comment.model.Comment;
 import com.example.domain.group.model.Group;
 
 @Entity
-@Table(name = "group_post")
+@Table(name = "post")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -36,6 +36,9 @@ public class Post {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @CreationTimestamp
+    private LocalDateTime updatedAt;
 
     @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)

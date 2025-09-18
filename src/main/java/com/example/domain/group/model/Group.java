@@ -11,10 +11,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.example.domain.participation.model.Participation;
 
 @Entity
-@Table(name = "purchase_group")
+@Table(name = "`group`")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -41,6 +43,9 @@ public class Group {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @CreationTimestamp
+    private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
